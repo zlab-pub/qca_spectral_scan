@@ -1,0 +1,36 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    compileSdk 33
+    ndkVersion '25.1.8937393'
+
+    defaultConfig {
+        applicationId 'com.example.spectral_plot'
+        minSdkVersion 24
+        targetSdkVersion 33
+        ndk {
+            abiFilters 'arm64-v8a'
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                          'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path 'src/main/cpp/CMakeLists.txt'
+        }
+    }
+    namespace 'com.example.spectral_plot'
+}
+
+dependencies {
+    def libsuVersion = '6.0.0'
+    implementation "com.github.topjohnwu.libsu:core:${libsuVersion}"
+    implementation "com.github.topjohnwu.libsu:service:${libsuVersion}"
+}
