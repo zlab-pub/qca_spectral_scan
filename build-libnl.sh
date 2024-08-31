@@ -2,7 +2,7 @@
 curl -fsSL https://github.com/thom311/libnl/releases/download/libnl3_10_0/libnl-3.10.0.tar.gz | tar -xvzf -
 cd ./libnl-3.10.0/ || exit
 sed -i 's|-lpthread||g' ./configure
-export TOOLCHAIN=~/Android/Sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/linux-x86_64/
+export TOOLCHAIN=~/Android/Sdk/ndk/26.3.11579264/toolchains/llvm/prebuilt/linux-x86_64/
 export TARGET=aarch64-linux-android
 export API=24
 export AR="${TOOLCHAIN}/bin/llvm-ar"
