@@ -4,7 +4,7 @@ cd ./libnl-3.10.0/ || exit
 sed -i 's|-lpthread||g' ./configure
 export TOOLCHAIN=~/Android/Sdk/ndk/25.1.8937393/toolchains/llvm/prebuilt/linux-x86_64/
 export TARGET=aarch64-linux-android
-export API=21
+export API=24
 export AR="${TOOLCHAIN}/bin/llvm-ar"
 export CC="${TOOLCHAIN}/bin/${TARGET}${API}-clang"
 export AS="${CC}"
