@@ -7,20 +7,20 @@ add_compile_options(-Wall -Wextra -Wconversion -Wshadow -Wno-unused-parameter -W
 
 set(distribution_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../../distribution")
 
-ExternalProject_Add(hostap
-  GIT_REPOSITORY git://w1.fi/hostap.git
-  GIT_TAG hostap_2_11
-  GIT_SHALLOW ON
-  SOURCE_DIR "${distribution_DIR}/src/hostap"
+ExternalProject_Add(hostapd
+  URL https://w1.fi/releases/hostapd-2.11.tar.gz
+  URL_HASH SHA256=2b3facb632fd4f65e32f4bf82a76b4b72c501f995a4f62e330219fe7aed1747a
+  DOWNLOAD_DIR "${distribution_DIR}/src"
+  SOURCE_DIR "${distribution_DIR}/src/hostapd"
   CONFIGURE_COMMAND ""
   BUILD_COMMAND ""
   INSTALL_COMMAND ""
   TEST_COMMAND ""
 )
 add_custom_command(
-  TARGET hostap POST_BUILD
+  TARGET hostapd POST_BUILD
   COMMAND "${CMAKE_COMMAND}" -E copy
-    "${distribution_DIR}/src/hostap/src/common/qca-vendor.h"
+    "${distribution_DIR}/src/hostapd/src/common/qca-vendor.h"
     "${distribution_DIR}/include/qca-vendor.h"
   BYPRODUCTS "${distribution_DIR}/include/qca-vendor.h"
   VERBATIM
@@ -68,11 +68,11 @@ set_target_properties(libnl-genl-3 PROPERTIES
 )
 
 add_library(spectral-scan SHARED spectral-scan.c)
-add_dependencies(spectral-scan hostap)
+add_dependencies(spectral-scan hostapd)
+target_link_libraries(spectral-scan android libnl-3 libnl-genl-3 log m)
 target_include_directories(spectral-scan
   PRIVATE "${distribution_DIR}/include" "${distribution_DIR}/include/libnl3"
 )
-target_link_libraries(spectral-scan android libnl-3 libnl-genl-3 log m)
 
 add_library(spectral-plot SHARED spectral-plot.c)
 target_link_libraries(spectral-plot android jnigraphics log m)
