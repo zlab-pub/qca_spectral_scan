@@ -31,7 +31,7 @@ ExternalProject_Add(libnl
   URL_HASH SHA256=49b3e2235fdb58f5910bbb3ed0de8143b71ffc220571540502eb6c2471f204f5
   DOWNLOAD_DIR "${distribution_DIR}/src"
   SOURCE_DIR "${distribution_DIR}/src/libnl"
-  PATCH_COMMAND sed -i "s|-lpthread||g" "${distribution_DIR}/src/libnl/configure"
+  PATCH_COMMAND sed -i "s/-lpthread//g" "${distribution_DIR}/src/libnl/configure"
   CONFIGURE_COMMAND  "${distribution_DIR}/src/libnl/configure" --enable-cli=no
     --host "${CMAKE_C_COMPILER_TARGET}"
     --prefix "${distribution_DIR}"
