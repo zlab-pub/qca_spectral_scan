@@ -7,5 +7,4 @@
 /app/.settings/
 /app/build/
 /distribution/
-/libnl-*/
 local.properties

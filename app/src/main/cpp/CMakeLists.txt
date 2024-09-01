@@ -26,11 +26,43 @@ add_custom_command(
   VERBATIM
 )
 
+ExternalProject_Add(libnl
+  URL https://github.com/thom311/libnl/releases/download/libnl3_10_0/libnl-3.10.0.tar.gz
+  URL_HASH SHA256=49b3e2235fdb58f5910bbb3ed0de8143b71ffc220571540502eb6c2471f204f5
+  DOWNLOAD_DIR "${distribution_DIR}/src"
+  SOURCE_DIR "${distribution_DIR}/src/libnl"
+  PATCH_COMMAND sed -i "s|-lpthread||g" "${distribution_DIR}/src/libnl/configure"
+  CONFIGURE_COMMAND  "${distribution_DIR}/src/libnl/configure" --enable-cli=no
+    --host "${CMAKE_C_COMPILER_TARGET}"
+    --prefix "${distribution_DIR}"
+    --exec-prefix "${distribution_DIR}/${ANDROID_ABI}"
+    "AS=${ANDROID_TOOLCHAIN_ROOT}/bin/clang --target=${CMAKE_C_COMPILER_TARGET}"
+    "CC=${ANDROID_TOOLCHAIN_ROOT}/bin/clang --target=${CMAKE_C_COMPILER_TARGET}"
+    "CXX=${ANDROID_TOOLCHAIN_ROOT}/bin/clang++ --target=${CMAKE_CXX_COMPILER_TARGET}"
+    "LD=${ANDROID_TOOLCHAIN_ROOT}/bin/ld"
+    "AR=${ANDROID_TOOLCHAIN_ROOT}/bin/llvm-ar"
+    "NM=${ANDROID_TOOLCHAIN_ROOT}/bin/llvm-nm"
+    "OBJCOPY=${ANDROID_TOOLCHAIN_ROOT}/bin/llvm-objcopy"
+    "OBJDUMP=${ANDROID_TOOLCHAIN_ROOT}/bin/llvm-objdump"
+    "RANLIB=${ANDROID_TOOLCHAIN_ROOT}/bin/llvm-ranlib"
+    "STRIP=${ANDROID_TOOLCHAIN_ROOT}/bin/llvm-strip"
+    "CFLAGS=-fPIC -Din_addr_t=uint32_t"
+    "CXXFLAGS=-fPIC -Din_addr_t=uint32_t"
+  BUILD_COMMAND make install
+  BUILD_BYPRODUCTS
+    "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-3.a"
+    "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-genl-3.a"
+  INSTALL_COMMAND ""
+  TEST_COMMAND ""
+)
+
 add_library(libnl-3 STATIC IMPORTED)
+add_dependencies(libnl-3 libnl)
 set_target_properties(libnl-3 PROPERTIES
   IMPORTED_LOCATION "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-3.a"
 )
 add_library(libnl-genl-3 STATIC IMPORTED)
+add_dependencies(libnl-genl-3 libnl)
 set_target_properties(libnl-genl-3 PROPERTIES
   IMPORTED_LOCATION "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-genl-3.a"
 )
