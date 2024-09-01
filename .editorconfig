@@ -9,3 +9,7 @@ tab_width = 8
 [*.{c,java}]
 indent_size = 2
 indent_style = space
+
+[CMakeLists.txt]
+indent_size = 2
+indent_style = space
