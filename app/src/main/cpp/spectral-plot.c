@@ -450,8 +450,8 @@ static void *recv_thread(void *arg) {
       } else if (length > 150 && length < 6250 && bt_chan_center % 5 == 3 &&
                  bt_chan_center / 5 >= 0 && bt_chan_center / 5 < NUM_ZB_CHANS &&
                  non_zb_score[bt_chan_center / 5] <= 0) {
-        LOGI("Chan: %d, Center: %.4f, BW: %.4f, Length: %d",
-             bt_chan_center / 5 + 11, center, bw, length);
+        // LOGI("Chan: %d, Center: %.4f, BW: %.4f, Length: %d",
+        //      bt_chan_center / 5 + 11, center, bw, length);
       }
     }
 #else

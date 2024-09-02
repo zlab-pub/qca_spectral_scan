@@ -69,8 +69,9 @@ static void *ap_ctrl_thread(void *arg) {
       if ((child_pid = fork()) == 0) {
         char freq_arg[6];
         snprintf(freq_arg, sizeof(freq_arg), "%d", state.ap_freqs[chan_idx]);
-        execl("/vendor/bin/hostapd_cli", "/vendor/bin/hostapd_cli",
-              "chan_switch", "1", freq_arg, NULL);
+#define HOSTAPD_CLI "/vendor/bin/hostapd_cli"
+        execl(HOSTAPD_CLI, HOSTAPD_CLI, "chan_switch", "1", freq_arg, NULL);
+#undef HOSTAPD_CLI
         exit(EXIT_FAILURE);
       }
       waitpid(child_pid, NULL, 0);
