@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+#include <sys/system_properties.h>
 #include <sys/un.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -305,9 +306,15 @@ JNIEXPORT void JNICALL Java_com_example_spectral_1plot_ScanService_startScan(
     return;
   }
 
-  unsigned ifindex = if_nametoindex("wlan0");
+  char ifname[PROP_VALUE_MAX] = "wlan0";
+  const prop_info *pi = __system_property_find("wifi.interface");
+  if (pi != NULL) {
+    __system_property_read(pi, NULL, ifname);
+  }
+
+  unsigned ifindex = if_nametoindex(ifname);
   if (ifindex == 0) {
-    LOGE("Can't get interface index: %s", strerror(errno));
+    LOGE("Can't get WLAN interface index: %s", strerror(errno));
     return;
   }
 
