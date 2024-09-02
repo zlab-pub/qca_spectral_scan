@@ -1,0 +1,24 @@
+name: Debug Build
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Build
+        run: ./gradlew assembleDebug
+      - name: Publish
+        env:
+          GH_REPO: ${{ github.repository }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cd app/build/outputs/apk/debug/
+          sha256sum app-debug.apk > app-debug.apk.sha256sum
+          gh release delete debug --yes || true
+          git push origin :debug || true
+          gh release create debug --prerelease app-debug.apk app-debug.apk.sha256sum
