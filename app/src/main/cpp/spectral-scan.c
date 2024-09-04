@@ -88,14 +88,13 @@ static void switch_ap_freq(int freq) {
   NLA_PUT(msg, NL80211_ATTR_BEACON_TAIL, sizeof(tail), tail);
   NLA_PUT_U16(msg, NL80211_ATTR_CSA_C_OFF_BEACON, sizeof(tail) - 1);
 
-  int nl_err = nla_nest_end(msg, nest);
-  if (nl_err < 0) {
+  if (nla_nest_end(msg, nest) < 0) {
     goto nla_put_failure;
   }
 
-  nl_err = nl_send_sync(state.nl_sock_ap_ctrl, msg);
-  if (nl_err < 0) {
-    LOGE("Can't switch AP frequency to %d MHz: %s", freq, nl_geterror(nl_err));
+  int nl_err = nl_send_sync(state.nl_sock_ap_ctrl, msg);
+  if (nl_err < 0 && (nl_err != -NLE_INVAL || (int)state.ap_freq != freq)) {
+    LOGE("Can't switch AP channel to %d MHz: %s", freq, nl_geterror(nl_err));
   }
 
   return;
