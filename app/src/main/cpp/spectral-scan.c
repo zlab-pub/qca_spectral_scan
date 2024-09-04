@@ -43,6 +43,7 @@ static struct {
   struct sockaddr_un saddr_forward;
   int sock_forward;
   unsigned ifindex;
+  char ap_ifname[IF_NAMESIZE];
   int send_fam;
   struct nl_sock *nl_sock_send;
   struct nl_sock *nl_sock_recv;
@@ -56,8 +57,8 @@ static struct {
 static void handle_sigint(int sig) {}
 
 static void switch_ap_freq(int freq) {
-  unsigned ifindex = if_nametoindex("wlan1");
-  if (ifindex == 0) {
+  unsigned ap_ifindex = if_nametoindex(state.ap_ifname);
+  if (ap_ifindex == 0) {
     LOGE("Can't get AP interface index: %s", strerror(errno));
     return;
   }
@@ -74,7 +75,7 @@ static void switch_ap_freq(int freq) {
     goto nla_put_failure;
   }
 
-  NLA_PUT_U32(msg, NL80211_ATTR_IFINDEX, ifindex);
+  NLA_PUT_U32(msg, NL80211_ATTR_IFINDEX, ap_ifindex);
   NLA_PUT_U32(msg, NL80211_ATTR_CH_SWITCH_COUNT, 1);
   NLA_PUT_U32(msg, NL80211_ATTR_WIPHY_FREQ, (uint32_t)freq);
   NLA_PUT(msg, NL80211_ATTR_BEACON_TAIL, 0, NULL);
@@ -348,17 +349,35 @@ JNIEXPORT void JNICALL Java_com_example_spectral_1plot_ScanService_startScan(
     return;
   }
 
-  char ifname[PROP_VALUE_MAX] = "wlan0";
+  char ifname[PROP_VALUE_MAX] = "";
   const prop_info *pi = __system_property_find("wifi.interface");
   if (pi != NULL) {
     __system_property_read(pi, NULL, ifname);
   }
-
+  if (ifname[0] == '\0') {
+    strlcpy(ifname, "wlan0", sizeof(ifname));
+  }
   unsigned ifindex = if_nametoindex(ifname);
   if (ifindex == 0) {
     LOGE("Can't get WLAN interface index: %s", strerror(errno));
     return;
   }
+
+  char ap_ifname[PROP_VALUE_MAX] = "";
+  pi = __system_property_find("ro.vendor.wifi.sap.interface");
+  if (pi != NULL) {
+    __system_property_read(pi, NULL, ap_ifname);
+  }
+  if (ap_ifname[0] == '\0') {
+    pi = __system_property_find("wifi.concurrent.interface");
+    if (pi != NULL) {
+      __system_property_read(pi, NULL, ap_ifname);
+    }
+  }
+  if (ap_ifname[0] == '\0') {
+    strlcpy(ap_ifname, "wlan1", sizeof(ap_ifname));
+  }
+  strlcpy(state.ap_ifname, ap_ifname, sizeof(state.ap_ifname));
 
   struct nl_sock *nl_sock_send = nl_socket_alloc();
   if (nl_sock_send == NULL) {
