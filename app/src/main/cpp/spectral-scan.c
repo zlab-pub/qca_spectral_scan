@@ -46,6 +46,7 @@ static struct {
   int send_fam;
   struct nl_sock *nl_sock_send;
   struct nl_sock *nl_sock_recv;
+  struct nl_sock *nl_sock_ap_ctrl;
   struct nl_sock *nl_sock_ap_event;
   pthread_t ap_ctrl_thread;
   pthread_t scan_thread;
@@ -53,6 +54,54 @@ static struct {
 } state;
 
 static void handle_sigint(int sig) {}
+
+static void switch_ap_freq(int freq) {
+  unsigned ifindex = if_nametoindex("wlan1");
+  if (ifindex == 0) {
+    LOGE("Can't get AP interface index: %s", strerror(errno));
+    return;
+  }
+
+  struct nl_msg *msg = nlmsg_alloc();
+  if (msg == NULL) {
+    LOGE("Can't allocate Netlink message for AP channel switch");
+    return;
+  }
+
+  if (genlmsg_put(msg, NL_AUTO_PORT, NL_AUTO_SEQ, state.send_fam, 0,
+                  NLM_F_REQUEST, NL80211_CMD_CHANNEL_SWITCH, 0) == NULL) {
+    LOGE("Can't add Generic Netlink header for AP channel switch");
+    goto nla_put_failure;
+  }
+
+  NLA_PUT_U32(msg, NL80211_ATTR_IFINDEX, ifindex);
+  NLA_PUT_U32(msg, NL80211_ATTR_CH_SWITCH_COUNT, 1);
+  NLA_PUT_U32(msg, NL80211_ATTR_WIPHY_FREQ, (uint32_t)freq);
+  NLA_PUT(msg, NL80211_ATTR_BEACON_TAIL, 0, NULL);
+
+  struct nlattr *nest = nla_nest_start(msg, NL80211_ATTR_CSA_IES);
+  if (nest == NULL) {
+    goto nla_put_failure;
+  }
+
+  const uint8_t tail[] = {37, 3, 0, 0, 1};
+  NLA_PUT(msg, NL80211_ATTR_BEACON_TAIL, sizeof(tail), tail);
+  NLA_PUT_U16(msg, NL80211_ATTR_CSA_C_OFF_BEACON, sizeof(tail) - 1);
+
+  int nl_err = nla_nest_end(msg, nest);
+  if (nl_err < 0) {
+    goto nla_put_failure;
+  }
+
+  nl_err = nl_send_sync(state.nl_sock_ap_ctrl, msg);
+  if (nl_err < 0) {
+    LOGE("Can't switch AP frequency to %d MHz: %s", freq, nl_geterror(nl_err));
+  }
+
+  return;
+nla_put_failure:
+  nlmsg_free(msg);
+}
 
 static void *ap_ctrl_thread(void *arg) {
   struct sigaction sa = {.sa_handler = handle_sigint};
@@ -66,16 +115,7 @@ static void *ap_ctrl_thread(void *arg) {
   unsigned counter = 0;
   while (state.running) {
     if (counter == 0) {
-      int child_pid = 0;
-      if ((child_pid = fork()) == 0) {
-        char freq_arg[6];
-        snprintf(freq_arg, sizeof(freq_arg), "%d", state.ap_freqs[chan_idx]);
-#define HOSTAPD_CLI "/vendor/bin/hostapd_cli"
-        execl(HOSTAPD_CLI, HOSTAPD_CLI, "chan_switch", "1", freq_arg, NULL);
-#undef HOSTAPD_CLI
-        exit(EXIT_FAILURE);
-      }
-      waitpid(child_pid, NULL, 0);
+      switch_ap_freq(state.ap_freqs[chan_idx]);
     }
     usleep(20000);
     if (++counter >= 50) {
@@ -127,22 +167,25 @@ static void *scan_thread(void *arg) {
   while (state.running) {
     struct nl_msg *msg_start = nlmsg_alloc();
     if (msg_start == NULL) {
-      LOGE("Can't allocate Netlink message");
+      LOGE("Can't allocate Netlink message for scan start");
       continue;
     }
 
     struct nl_msg *msg_stop = nlmsg_alloc();
     if (msg_stop == NULL) {
-      LOGE("Can't allocate Netlink message");
+      LOGE("Can't allocate Netlink message for scan stop");
       nlmsg_free(msg_start);
       continue;
     }
 
     if (genlmsg_put(msg_start, NL_AUTO_PORT, NL_AUTO_SEQ, state.send_fam, 0, 0,
-                    NL80211_CMD_VENDOR, 0) == NULL ||
-        genlmsg_put(msg_stop, NL_AUTO_PORT, NL_AUTO_SEQ, state.send_fam, 0, 0,
                     NL80211_CMD_VENDOR, 0) == NULL) {
-      LOGE("Can't add Generic Netlink headers");
+      LOGE("Can't add Generic Netlink header for scan start");
+      goto nla_put_failure;
+    }
+    if (genlmsg_put(msg_stop, NL_AUTO_PORT, NL_AUTO_SEQ, state.send_fam, 0, 0,
+                    NL80211_CMD_VENDOR, 0) == NULL) {
+      LOGE("Can't add Generic Netlink header for scan stop");
       goto nla_put_failure;
     }
 
@@ -159,7 +202,7 @@ static void *scan_thread(void *arg) {
 
     struct nlattr *nest = nla_nest_start(msg_start, NL80211_ATTR_VENDOR_DATA);
     if (nest == NULL) {
-      LOGE("Can't start adding config");
+      LOGE("Can't start config data");
       goto nla_put_failure;
     }
 
@@ -176,7 +219,7 @@ static void *scan_thread(void *arg) {
 
     int nl_err = nla_nest_end(msg_start, nest);
     if (nl_err < 0) {
-      LOGE("Can't stop adding config: %s", nl_geterror(nl_err));
+      LOGE("Can't end config data: %s", nl_geterror(nl_err));
       goto nla_put_failure;
     }
 
@@ -364,6 +407,20 @@ JNIEXPORT void JNICALL Java_com_example_spectral_1plot_ScanService_startScan(
 
   nl_socket_disable_seq_check(nl_sock_recv);
 
+  struct nl_sock *nl_sock_ap_ctrl = nl_socket_alloc();
+  if (nl_sock_send == NULL) {
+    LOGE("Can't allocate AP control socket");
+    return;
+  }
+
+  nl_err = genl_connect(nl_sock_ap_ctrl);
+  if (nl_err < 0) {
+    LOGE("Can't connect AP control socket: %s", nl_geterror(nl_err));
+    return;
+  }
+
+  nl_socket_disable_seq_check(nl_sock_ap_ctrl);
+
   struct nl_sock *nl_sock_ap_event = nl_socket_alloc();
   if (nl_sock_ap_event == NULL) {
     LOGE("Can't allocate AP event socket");
@@ -412,6 +469,7 @@ JNIEXPORT void JNICALL Java_com_example_spectral_1plot_ScanService_startScan(
   state.send_fam = send_fam;
   state.nl_sock_send = nl_sock_send;
   state.nl_sock_recv = nl_sock_recv;
+  state.nl_sock_ap_ctrl = nl_sock_ap_ctrl;
   state.nl_sock_ap_event = nl_sock_ap_event;
 
   state.running = true;
@@ -438,6 +496,7 @@ Java_com_example_spectral_1plot_ScanService_stopScan(JNIEnv *env, jobject obj) {
   state.ap_freqs = NULL;
 
   nl_socket_free(state.nl_sock_ap_event);
+  nl_socket_free(state.nl_sock_ap_ctrl);
   nl_socket_free(state.nl_sock_recv);
   nl_socket_free(state.nl_sock_send);
 
@@ -445,6 +504,8 @@ Java_com_example_spectral_1plot_ScanService_stopScan(JNIEnv *env, jobject obj) {
     LOGW("Can't close forward socket: %s", strerror(errno));
   }
 
+  state.nl_sock_ap_event = NULL;
+  state.nl_sock_ap_ctrl = NULL;
   state.nl_sock_recv = NULL;
   state.nl_sock_send = NULL;
 }
