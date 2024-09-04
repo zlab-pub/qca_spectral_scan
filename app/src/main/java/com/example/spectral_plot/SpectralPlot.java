@@ -52,7 +52,7 @@ public class SpectralPlot extends Activity {
   };
   private boolean[] apFreqsSelected = new boolean[apFreqsAll.length];
   private int fftSize = 7;
-  private boolean showPulses = true;
+  private boolean showPulses = false;
   private ScanConnection scanConn;
 
   private int[] getApFreqs() {
