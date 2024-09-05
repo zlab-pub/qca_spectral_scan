@@ -22,4 +22,4 @@ Many Qualcomm chips' spectral scan feature can only cover a 40 MHz range centere
 
 This app will show a spectrogram on the screen, where brighter colors indicate higher FFT magnitudes. A short click on the screen will pause or resume the scanning, while a long click will show a configuration dialog. This app also employs a simple algorithm to detect Bluetooth transmission and estimate its strength. The following is a screenshot of the app in the presence of Bluetooth transmission.
 
-![A screenshot of the app in the presence of Bluetooth transmission.](assets/images/screenshot.png)
+<img src="assets/images/screenshot.png" alt="A screenshot of the app in the presence of Bluetooth transmission." width="50%"/>
