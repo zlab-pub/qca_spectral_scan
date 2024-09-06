@@ -43,7 +43,7 @@ static struct {
   struct sockaddr_un saddr_forward;
   int sock_forward;
   unsigned ifindex;
-  char ap_ifname[IF_NAMESIZE];
+  atomic_uint_least32_t ap_ifindex;
   int send_fam;
   struct nl_sock *nl_sock_send;
   struct nl_sock *nl_sock_recv;
@@ -57,8 +57,7 @@ static struct {
 static void handle_sigint(int sig) {}
 
 static void switch_ap_freq(int freq) {
-  unsigned ap_ifindex = if_nametoindex(state.ap_ifname);
-  if (ap_ifindex == 0) {
+  if (state.ap_ifindex == 0) {
     LOGE("Can't get AP interface index: %s", strerror(errno));
     return;
   }
@@ -75,7 +74,7 @@ static void switch_ap_freq(int freq) {
     goto nla_put_failure;
   }
 
-  NLA_PUT_U32(msg, NL80211_ATTR_IFINDEX, ap_ifindex);
+  NLA_PUT_U32(msg, NL80211_ATTR_IFINDEX, state.ap_ifindex);
   NLA_PUT_U32(msg, NL80211_ATTR_CH_SWITCH_COUNT, 1);
   NLA_PUT_U32(msg, NL80211_ATTR_WIPHY_FREQ, (uint32_t)freq);
   NLA_PUT(msg, NL80211_ATTR_BEACON_TAIL, 0, NULL);
@@ -151,11 +150,15 @@ static void check_ap_freq() {
       continue;
     }
 
-    const struct nlattr *nla =
-        nla_find(genlmsg_attrdata(gnlh, 0), genlmsg_attrlen(gnlh, 0),
-                 NL80211_ATTR_WIPHY_FREQ);
-    if (nla != NULL) {
-      state.ap_freq = nla_get_u32(nla);
+    const struct nlattr *nla;
+    int rem;
+    nla_for_each_attr(nla, genlmsg_attrdata(gnlh, 0), genlmsg_attrlen(gnlh, 0),
+                      rem) {
+      if (nla_type(nla) == NL80211_ATTR_IFINDEX) {
+        state.ap_ifindex = nla_get_u32(nla);
+      } else if (nla_type(nla) == NL80211_ATTR_WIPHY_FREQ) {
+        state.ap_freq = nla_get_u32(nla);
+      }
     }
   }
 }
@@ -377,7 +380,7 @@ JNIEXPORT void JNICALL Java_com_example_spectral_1plot_ScanService_startScan(
   if (ap_ifname[0] == '\0') {
     strlcpy(ap_ifname, "wlan1", sizeof(ap_ifname));
   }
-  strlcpy(state.ap_ifname, ap_ifname, sizeof(state.ap_ifname));
+  state.ap_ifindex = if_nametoindex(ap_ifname);
 
   struct nl_sock *nl_sock_send = nl_socket_alloc();
   if (nl_sock_send == NULL) {

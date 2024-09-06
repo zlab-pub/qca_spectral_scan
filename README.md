@@ -18,7 +18,7 @@ Alternatively, build the app on a Linux system with JDK 17 (or above) and Androi
 
 ## Usage
 
-Many Qualcomm chips' spectral scan feature can only cover a 40 MHz range centered at the frequency of the current Wi-Fi channel. Therefore, it's better to run this app with hotspot enabled and "Turn off hotspot automatically" disabled. The app will then periodically switch the channel of the hotspot to cover different frequency ranges.
+Many Qualcomm chips' spectral scan feature can only cover a 40 MHz range centered at the frequency of the current Wi-Fi channel. Therefore, it's better to run this app with hotspot enabled and "Turn off hotspot automatically" disabled. The app will then periodically switch the channel of the hotspot to cover different frequency ranges. If enabling hotspot before launching the app doesn't work, try enabling hotspot after launching the app instead.
 
 This app will show a spectrogram on the screen, where brighter colors indicate higher FFT magnitudes. A short click on the screen will pause or resume the scanning, while a long click will show a configuration dialog. This app also employs a simple algorithm to detect Bluetooth transmission and estimate its strength. The following is a screenshot of the app in the presence of Bluetooth transmission.
 
