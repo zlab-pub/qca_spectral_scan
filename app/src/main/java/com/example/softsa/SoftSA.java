@@ -188,7 +188,7 @@ class PlotView extends View {
   private double bluetoothPower = Double.NaN;
   private double pulseFreq = Double.NaN;
 
-  protected PlotView(Context context) {
+  PlotView(Context context) {
     super(context);
     float density = getResources().getDisplayMetrics().density;
     rightLargePaint.setColor(Color.YELLOW);
@@ -274,8 +274,8 @@ class ScanService extends RootService implements Handler.Callback {
 
   private static native void stopScan();
 
-  protected static final int MSG_PAUSE = 0;
-  protected static final int MSG_CONFIG = 1;
+  static final int MSG_PAUSE = 0;
+  static final int MSG_CONFIG = 1;
 
   private int[] apFreqs;
   private int fftSize;
@@ -338,7 +338,7 @@ class ScanConnection implements ServiceConnection {
     m = null;
   }
 
-  protected void pause() {
+  void pause() {
     if (m == null) {
       return;
     }
@@ -352,7 +352,7 @@ class ScanConnection implements ServiceConnection {
     }
   }
 
-  protected void config(int[] apFreqs, int fftSize) {
+  void config(int[] apFreqs, int fftSize) {
     if (m == null) {
       return;
     }
