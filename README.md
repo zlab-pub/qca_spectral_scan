@@ -1,6 +1,6 @@
 # Spectral Plot
 
-A wireless spectrum analyzer app for Android phones.
+An RF spectrum analyzer app for Android phones using only built-in hardware.
 
 ## Requirements
 
