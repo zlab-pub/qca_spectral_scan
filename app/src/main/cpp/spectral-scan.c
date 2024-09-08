@@ -325,7 +325,7 @@ static void *forward_thread(void *arg) {
 }
 
 JNIEXPORT void JNICALL Java_com_example_softsa_ScanService_startScan(
-    JNIEnv *env, jobject obj, jintArray apFreqs, jint fftSize,
+    JNIEnv *env, jclass cls, jintArray apFreqs, jint fftSize,
     jstring sockPath) {
   if (state.running) {
     return;
@@ -500,7 +500,7 @@ JNIEXPORT void JNICALL Java_com_example_softsa_ScanService_startScan(
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_softsa_ScanService_stopScan(JNIEnv *env, jobject obj) {
+Java_com_example_softsa_ScanService_stopScan(JNIEnv *env, jclass cls) {
   if (!state.running) {
     return;
   }

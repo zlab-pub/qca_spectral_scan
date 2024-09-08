@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.Window;
 
 import java.io.File;
-import java.lang.Class;
 import java.lang.Double;
 import java.lang.Float;
 import java.lang.Math;
@@ -36,16 +35,6 @@ import java.util.stream.IntStream;
 import com.topjohnwu.superuser.ipc.RootService;
 
 public class SoftSA extends Activity {
-  static {
-    System.loadLibrary("spectral-plot");
-  }
-
-  private native void startPlot(Class<?> viewClass, String sockPath);
-
-  private native void stopPlot();
-
-  private native void configPlot(boolean showPulses);
-
   private static final int[] apFreqsAll = {
     2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472,
     5180, 5200, 5220, 5240, 5745, 5765, 5785, 5805, 5825,
@@ -104,7 +93,7 @@ public class SoftSA extends Activity {
     });
     builder.setPositiveButton("OK", (dialog, id) -> {
       showPulses = checkedItems[0];
-      configPlot(showPulses);
+      PlotView.configPlot(showPulses);
     });
     builder.setNegativeButton("Cancel", null);
     return builder.create();
@@ -138,8 +127,8 @@ public class SoftSA extends Activity {
     });
     String uuid = UUID.randomUUID().toString();
     String sockPath = new File(getCacheDir(), uuid + ".sock").getAbsolutePath();
-    configPlot(showPulses);
-    startPlot(PlotView.class, sockPath);
+    PlotView.configPlot(showPulses);
+    PlotView.startPlot(sockPath);
     View view = new PlotView(this);
     setContentView(view);
     scanConn = new ScanConnection();
@@ -161,14 +150,24 @@ public class SoftSA extends Activity {
   protected void onDestroy() {
     super.onDestroy();
     RootService.unbind(scanConn);
-    stopPlot();
+    PlotView.stopPlot();
   }
 }
 
 class PlotView extends View {
-  private native long updatePlot(Bitmap bitmap);
+  static {
+    System.loadLibrary("spectral-plot");
+  }
 
-  private native void changeHeight(int height);
+  static native void startPlot(String sockPath);
+
+  static native void stopPlot();
+
+  static native void configPlot(boolean showPulses);
+
+  private static native void changeHeight(int height);
+
+  private native long updatePlot(Bitmap bitmap);
 
   private Bitmap plotBitmap;
   private final Rect r = new Rect();

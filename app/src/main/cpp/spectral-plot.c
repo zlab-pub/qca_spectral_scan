@@ -613,22 +613,22 @@ static size_t update_plot(const AndroidBitmapInfo *info,
   return num_scans;
 }
 
-JNIEXPORT void JNICALL Java_com_example_softsa_SoftSA_startPlot(
-    JNIEnv *env, jobject obj, jclass viewClass, jstring sockPath) {
+JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_startPlot(
+    JNIEnv *env, jclass cls, jstring sockPath) {
   if (state.running) {
     return;
   }
 
-  state.elapsed_q1_fid = (*env)->GetFieldID(env, viewClass, "elapsedQ1", "J");
-  state.elapsed_q2_fid = (*env)->GetFieldID(env, viewClass, "elapsedQ2", "J");
-  state.elapsed_q3_fid = (*env)->GetFieldID(env, viewClass, "elapsedQ3", "J");
-  state.center_pos_fid = (*env)->GetFieldID(env, viewClass, "centerPos", "F");
-  state.center_freq_fid = (*env)->GetFieldID(env, viewClass, "centerFreq", "I");
-  state.span_width_fid = (*env)->GetFieldID(env, viewClass, "spanWidth", "I");
+  state.elapsed_q1_fid = (*env)->GetFieldID(env, cls, "elapsedQ1", "J");
+  state.elapsed_q2_fid = (*env)->GetFieldID(env, cls, "elapsedQ2", "J");
+  state.elapsed_q3_fid = (*env)->GetFieldID(env, cls, "elapsedQ3", "J");
+  state.center_pos_fid = (*env)->GetFieldID(env, cls, "centerPos", "F");
+  state.center_freq_fid = (*env)->GetFieldID(env, cls, "centerFreq", "I");
+  state.span_width_fid = (*env)->GetFieldID(env, cls, "spanWidth", "I");
 #ifdef SPECTRAL_DETECT
-  state.bt_pwr_fid = (*env)->GetFieldID(env, viewClass, "bluetoothPower", "D");
+  state.bt_pwr_fid = (*env)->GetFieldID(env, cls, "bluetoothPower", "D");
 #else
-  state.pulse_freq_fid = (*env)->GetFieldID(env, viewClass, "pulseFreq", "D");
+  state.pulse_freq_fid = (*env)->GetFieldID(env, cls, "pulseFreq", "D");
 #endif
 
   const char *sock_path = (*env)->GetStringUTFChars(env, sockPath, NULL);
@@ -670,8 +670,8 @@ JNIEXPORT void JNICALL Java_com_example_softsa_SoftSA_startPlot(
   pthread_create(&state.recv_thread, 0, recv_thread, NULL);
 }
 
-JNIEXPORT void JNICALL Java_com_example_softsa_SoftSA_stopPlot(JNIEnv *env,
-                                                               jobject obj) {
+JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_stopPlot(JNIEnv *env,
+                                                                 jclass cls) {
   if (!state.running) {
     return;
   }
@@ -694,13 +694,13 @@ JNIEXPORT void JNICALL Java_com_example_softsa_SoftSA_stopPlot(JNIEnv *env,
   state.sock_path = NULL;
 }
 
-JNIEXPORT void JNICALL Java_com_example_softsa_SoftSA_configPlot(
-    JNIEnv *env, jobject obj, jboolean showPulses) {
+JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_configPlot(
+    JNIEnv *env, jclass cls, jboolean showPulses) {
   state.show_pulses = showPulses;
 }
 
 JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_changeHeight(
-    JNIEnv *env, jobject obj, jint height) {
+    JNIEnv *env, jclass cls, jint height) {
   sem_wait(&state.sem);
   if (height >= 0 && (size_t)height != state.rbuffer_capacity) {
     resize_rbuffer(height);
