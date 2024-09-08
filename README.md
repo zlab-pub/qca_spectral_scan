@@ -6,7 +6,7 @@ An RF spectrum analyzer app for Android phones using only built-in hardware.
 
 This app requires an Android phone with the following:
 
-- Android 7 or above (tested on Android 11 and 14)
+- Android 7 or above (tested on Google Pixel 5 with Android 11 and Android 14)
 - Root access (e.g. using [Magisk](https://github.com/topjohnwu/Magisk/))
 - Qualcomm qcacld-3.0 driver
 
