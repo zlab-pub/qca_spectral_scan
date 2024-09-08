@@ -167,7 +167,7 @@ class PlotView extends View {
 
   private static native void changeHeight(int height);
 
-  private native long updatePlot(Bitmap bitmap);
+  private static native long updatePlot(PlotView view, Bitmap bitmap);
 
   private Bitmap plotBitmap;
   private final Rect r = new Rect();
@@ -218,7 +218,7 @@ class PlotView extends View {
   @Override
   protected void onDraw(Canvas canvas) {
     long drawTime = System.nanoTime();
-    long numScans = updatePlot(plotBitmap);
+    long numScans = updatePlot(this, plotBitmap);
     long elapsedNano60 = Math.max(drawTime - prevDrawTime[numDrawsMod60], 1);
     prevDrawTime[numDrawsMod60] = drawTime;
     prevNumScans[numDrawsMod60] = numScans;

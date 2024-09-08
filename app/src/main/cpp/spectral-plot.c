@@ -709,7 +709,7 @@ JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_changeHeight(
 }
 
 JNIEXPORT jlong JNICALL Java_com_example_softsa_PlotView_updatePlot(
-    JNIEnv *env, jobject obj, jobject bitmap) {
+    JNIEnv *env, jclass cls, jobject view, jobject bitmap) {
   AndroidBitmapInfo info;
   void *pixels;
   int ret;
@@ -773,16 +773,16 @@ JNIEXPORT jlong JNICALL Java_com_example_softsa_PlotView_updatePlot(
 
   AndroidBitmap_unlockPixels(env, bitmap);
 
-  (*env)->SetLongField(env, obj, state.elapsed_q1_fid, tstamp_q0 - tstamp_q1);
-  (*env)->SetLongField(env, obj, state.elapsed_q2_fid, tstamp_q0 - tstamp_q2);
-  (*env)->SetLongField(env, obj, state.elapsed_q3_fid, tstamp_q0 - tstamp_q3);
-  (*env)->SetFloatField(env, obj, state.center_pos_fid, center_pos);
-  (*env)->SetIntField(env, obj, state.center_freq_fid, center_freq);
-  (*env)->SetIntField(env, obj, state.span_width_fid, SPAN_WIDTH);
+  (*env)->SetLongField(env, view, state.elapsed_q1_fid, tstamp_q0 - tstamp_q1);
+  (*env)->SetLongField(env, view, state.elapsed_q2_fid, tstamp_q0 - tstamp_q2);
+  (*env)->SetLongField(env, view, state.elapsed_q3_fid, tstamp_q0 - tstamp_q3);
+  (*env)->SetFloatField(env, view, state.center_pos_fid, center_pos);
+  (*env)->SetIntField(env, view, state.center_freq_fid, center_freq);
+  (*env)->SetIntField(env, view, state.span_width_fid, SPAN_WIDTH);
 #ifdef SPECTRAL_DETECT
-  (*env)->SetDoubleField(env, obj, state.bt_pwr_fid, bt_pwr);
+  (*env)->SetDoubleField(env, view, state.bt_pwr_fid, bt_pwr);
 #else
-  (*env)->SetDoubleField(env, obj, state.pulse_freq_fid, pulse_freq);
+  (*env)->SetDoubleField(env, view, state.pulse_freq_fid, pulse_freq);
 #endif
 
   return (jlong)num_scans;
