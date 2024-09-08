@@ -324,7 +324,7 @@ static void *forward_thread(void *arg) {
   return NULL;
 }
 
-JNIEXPORT void JNICALL Java_com_example_spectral_1plot_ScanService_startScan(
+JNIEXPORT void JNICALL Java_com_example_softsa_ScanService_startScan(
     JNIEnv *env, jobject obj, jintArray apFreqs, jint fftSize,
     jstring sockPath) {
   if (state.running) {
@@ -500,7 +500,7 @@ JNIEXPORT void JNICALL Java_com_example_spectral_1plot_ScanService_startScan(
 }
 
 JNIEXPORT void JNICALL
-Java_com_example_spectral_1plot_ScanService_stopScan(JNIEnv *env, jobject obj) {
+Java_com_example_softsa_ScanService_stopScan(JNIEnv *env, jobject obj) {
   if (!state.running) {
     return;
   }

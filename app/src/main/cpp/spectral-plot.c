@@ -613,7 +613,7 @@ static size_t update_plot(const AndroidBitmapInfo *info,
   return num_scans;
 }
 
-JNIEXPORT void JNICALL Java_com_example_spectral_1plot_SpectralPlot_startPlot(
+JNIEXPORT void JNICALL Java_com_example_softsa_SoftSA_startPlot(
     JNIEnv *env, jobject obj, jclass viewClass, jstring sockPath) {
   if (state.running) {
     return;
@@ -670,8 +670,8 @@ JNIEXPORT void JNICALL Java_com_example_spectral_1plot_SpectralPlot_startPlot(
   pthread_create(&state.recv_thread, 0, recv_thread, NULL);
 }
 
-JNIEXPORT void JNICALL Java_com_example_spectral_1plot_SpectralPlot_stopPlot(
-    JNIEnv *env, jobject obj) {
+JNIEXPORT void JNICALL Java_com_example_softsa_SoftSA_stopPlot(JNIEnv *env,
+                                                               jobject obj) {
   if (!state.running) {
     return;
   }
@@ -694,15 +694,13 @@ JNIEXPORT void JNICALL Java_com_example_spectral_1plot_SpectralPlot_stopPlot(
   state.sock_path = NULL;
 }
 
-JNIEXPORT void JNICALL Java_com_example_spectral_1plot_SpectralPlot_configPlot(
+JNIEXPORT void JNICALL Java_com_example_softsa_SoftSA_configPlot(
     JNIEnv *env, jobject obj, jboolean showPulses) {
   state.show_pulses = showPulses;
 }
 
-JNIEXPORT void JNICALL
-Java_com_example_spectral_1plot_SpectralPlotView_changeHeight(JNIEnv *env,
-                                                              jobject obj,
-                                                              jint height) {
+JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_changeHeight(
+    JNIEnv *env, jobject obj, jint height) {
   sem_wait(&state.sem);
   if (height >= 0 && (size_t)height != state.rbuffer_capacity) {
     resize_rbuffer(height);
@@ -710,10 +708,8 @@ Java_com_example_spectral_1plot_SpectralPlotView_changeHeight(JNIEnv *env,
   sem_post(&state.sem);
 }
 
-JNIEXPORT jlong JNICALL
-Java_com_example_spectral_1plot_SpectralPlotView_updatePlot(JNIEnv *env,
-                                                            jobject obj,
-                                                            jobject bitmap) {
+JNIEXPORT jlong JNICALL Java_com_example_softsa_PlotView_updatePlot(
+    JNIEnv *env, jobject obj, jobject bitmap) {
   AndroidBitmapInfo info;
   void *pixels;
   int ret;

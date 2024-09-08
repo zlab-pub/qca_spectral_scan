@@ -1,4 +1,4 @@
-# Spectral Plot
+# SoftSA
 
 An RF spectrum analyzer app for Android phones using only built-in hardware.
 
@@ -12,7 +12,7 @@ This app requires an Android phone with the following:
 
 ## Installation
 
-Download the APK file built by GitHub Actions from the [Releases](https://github.com/zlab-pub/spectral-plot/releases) page and install it using `adb install`.
+Download the APK file built by GitHub Actions from the [Releases](https://github.com/zlab-pub/SoftSA/releases) page and install it using `adb install`.
 
 Alternatively, build the app on a Linux system with JDK 17 (or above) and Android SDK 34 by running `./gradlew assembleDebug`, which produces an APK file at `app/build/outputs/apk/debug/app-debug.apk`.
 

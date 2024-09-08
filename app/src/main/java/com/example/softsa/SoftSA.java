@@ -1,4 +1,4 @@
-package com.example.spectral_plot;
+package com.example.softsa;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -35,7 +35,7 @@ import java.util.stream.IntStream;
 
 import com.topjohnwu.superuser.ipc.RootService;
 
-public class SpectralPlot extends Activity {
+public class SoftSA extends Activity {
   static {
     System.loadLibrary("spectral-plot");
   }
@@ -139,14 +139,14 @@ public class SpectralPlot extends Activity {
     String uuid = UUID.randomUUID().toString();
     String sockPath = new File(getCacheDir(), uuid + ".sock").getAbsolutePath();
     configPlot(showPulses);
-    startPlot(SpectralPlotView.class, sockPath);
-    View view = new SpectralPlotView(this);
+    startPlot(PlotView.class, sockPath);
+    View view = new PlotView(this);
     setContentView(view);
     scanConn = new ScanConnection();
     Intent scanIntent = new Intent(this, ScanService.class);
-    scanIntent.putExtra("com.example.spectral_plot.ap_freqs", getApFreqs());
-    scanIntent.putExtra("com.example.spectral_plot.fft_size", fftSize);
-    scanIntent.putExtra("com.example.spectral_plot.sock_path", sockPath);
+    scanIntent.putExtra("com.example.softsa.ap_freqs", getApFreqs());
+    scanIntent.putExtra("com.example.softsa.fft_size", fftSize);
+    scanIntent.putExtra("com.example.softsa.sock_path", sockPath);
     RootService.bind(scanIntent, scanConn);
     view.setOnClickListener(v -> {
       scanConn.pause();
@@ -165,7 +165,7 @@ public class SpectralPlot extends Activity {
   }
 }
 
-class SpectralPlotView extends View {
+class PlotView extends View {
   private native long updatePlot(Bitmap bitmap);
 
   private native void changeHeight(int height);
@@ -189,7 +189,7 @@ class SpectralPlotView extends View {
   private double bluetoothPower = Double.NaN;
   private double pulseFreq = Double.NaN;
 
-  protected SpectralPlotView(Context context) {
+  protected PlotView(Context context) {
     super(context);
     float density = getResources().getDisplayMetrics().density;
     rightLargePaint.setColor(Color.YELLOW);
@@ -285,9 +285,9 @@ class ScanService extends RootService implements Handler.Callback {
 
   @Override
   public IBinder onBind(Intent intent) {
-    apFreqs = intent.getIntArrayExtra("com.example.spectral_plot.ap_freqs");
-    fftSize = intent.getIntExtra("com.example.spectral_plot.fft_size", 0);
-    sockPath = intent.getStringExtra("com.example.spectral_plot.sock_path");
+    apFreqs = intent.getIntArrayExtra("com.example.softsa.ap_freqs");
+    fftSize = intent.getIntExtra("com.example.softsa.fft_size", 0);
+    sockPath = intent.getStringExtra("com.example.softsa.sock_path");
     startScan(apFreqs, fftSize, sockPath);
     Handler h = new Handler(Looper.getMainLooper(), this);
     Messenger m = new Messenger(h);
