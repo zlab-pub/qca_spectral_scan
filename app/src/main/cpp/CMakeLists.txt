@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(spectral-plot)
+project(softsa C)
 include(ExternalProject)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
