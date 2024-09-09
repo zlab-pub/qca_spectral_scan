@@ -560,6 +560,7 @@ static void resize_rbuffer(int32_t height) {
     free(state.rbuffer);
     state.rbuffer = calloc((size_t)height, sizeof(struct plot_data));
     if (state.rbuffer == NULL) {
+      LOGW("Can't allocate ring buffer");
       height = 0;
     }
   } else {
