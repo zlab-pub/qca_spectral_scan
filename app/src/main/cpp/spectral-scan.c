@@ -94,7 +94,7 @@ static void switch_ap_freq(int freq) {
 
   int nl_err = nl_send_sync(state.nl_sock_ap_ctrl, msg);
   if (nl_err < 0 && (nl_err != -NLE_INVAL || (int)state.ap_freq != freq)) {
-    LOGE("Can't switch AP channel to %d MHz: %s", freq, nl_geterror(nl_err));
+    LOGW("Can't switch AP channel to %d MHz: %s", freq, nl_geterror(nl_err));
   }
 
   return;
@@ -230,7 +230,7 @@ static void *scan_thread(void *arg) {
 
     nl_err = nl_send_sync(state.nl_sock_send, msg_start);
     if (nl_err < 0) {
-      LOGE("Can't start spectral scan: %s", nl_geterror(nl_err));
+      LOGW("Can't start spectral scan: %s", nl_geterror(nl_err));
     }
 
     state.scan_freq = state.ap_freq;
@@ -238,7 +238,7 @@ static void *scan_thread(void *arg) {
 
     nl_err = nl_send_sync(state.nl_sock_send, msg_stop);
     if (nl_err < 0) {
-      LOGE("Can't stop spectral scan: %s", nl_geterror(nl_err));
+      LOGW("Can't stop spectral scan: %s", nl_geterror(nl_err));
     }
 
     continue;
