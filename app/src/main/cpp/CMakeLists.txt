@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.13)
-project(softsa C)
+project(SoftSA C)
 include(ExternalProject)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
