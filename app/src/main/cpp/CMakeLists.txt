@@ -56,15 +56,15 @@ ExternalProject_Add(libnl
   TEST_COMMAND ""
 )
 
-add_library(libnl-3 STATIC IMPORTED)
+add_library(libnl-3 SHARED IMPORTED)
 add_dependencies(libnl-3 libnl)
 set_target_properties(libnl-3 PROPERTIES
-  IMPORTED_LOCATION "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-3.a"
+  IMPORTED_LOCATION "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-3.so"
 )
-add_library(libnl-genl-3 STATIC IMPORTED)
+add_library(libnl-genl-3 SHARED IMPORTED)
 add_dependencies(libnl-genl-3 libnl)
 set_target_properties(libnl-genl-3 PROPERTIES
-  IMPORTED_LOCATION "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-genl-3.a"
+  IMPORTED_LOCATION "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-genl-3.so"
 )
 
 add_library(spectral-scan SHARED spectral-scan.c)
