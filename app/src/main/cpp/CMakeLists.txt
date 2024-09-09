@@ -25,6 +25,7 @@ add_custom_command(
   BYPRODUCTS "${distribution_DIR}/include/qca-vendor.h"
   VERBATIM
 )
+add_custom_target(qca_vendor_h DEPENDS "${distribution_DIR}/include/qca-vendor.h")
 
 ExternalProject_Add(libnl
   URL https://github.com/thom311/libnl/releases/download/libnl3_10_0/libnl-3.10.0.tar.gz
@@ -68,7 +69,7 @@ set_target_properties(libnl-genl-3 PROPERTIES
 )
 
 add_library(spectral-scan SHARED spectral-scan.c)
-add_dependencies(spectral-scan hostapd)
+add_dependencies(spectral-scan qca_vendor_h)
 target_link_libraries(spectral-scan android libnl-3 libnl-genl-3 log m)
 target_include_directories(spectral-scan
   PRIVATE "${distribution_DIR}/include" "${distribution_DIR}/include/libnl3"
