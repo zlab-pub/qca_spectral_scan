@@ -50,8 +50,8 @@ ExternalProject_Add(libnl
     "CXXFLAGS=-fPIC -Din_addr_t=uint32_t"
   BUILD_COMMAND make install
   BUILD_BYPRODUCTS
-    "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-3.a"
-    "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-genl-3.a"
+    "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-3.so"
+    "${distribution_DIR}/${ANDROID_ABI}/lib/libnl-genl-3.so"
   INSTALL_COMMAND ""
   TEST_COMMAND ""
 )
