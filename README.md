@@ -17,7 +17,7 @@ Download the APK file built by GitHub Actions from the [Releases](https://github
 Alternatively, build the app on a Linux system with JDK 17 (or above) and Android SDK 34 by running `./gradlew assembleDebug`, which produces an APK file at `app/build/outputs/apk/debug/app-debug.apk`. The following third-party dependencies will be downloaded during the build process:
 
 - [libsu](https://github.com/topjohnwu/libsu) will be downloaded by Gradle.
-- [libnl](https://github.com/thom311/libnl) will be downloaded by CMake, built from source, and included in the app as a shared library.
+- [libnl](https://github.com/thom311/libnl) will be downloaded by CMake, built from source, and included in the app as shared libraries.
 - [hostapd](https://w1.fi/hostapd/) will be downloaded by CMake, though this app only uses its [qca-vendor.h](https://w1.fi/cgit/hostap/plain/src/common/qca-vendor.h) header file.
 
 ## Usage
