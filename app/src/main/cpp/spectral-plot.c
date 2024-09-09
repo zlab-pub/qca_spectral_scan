@@ -220,6 +220,7 @@ struct plot_data {
 static struct {
   atomic_bool running;
   atomic_bool show_pulses;
+  jfieldID bitmap_fid;
   jfieldID elapsed_q1_fid;
   jfieldID elapsed_q2_fid;
   jfieldID elapsed_q3_fid;
@@ -619,6 +620,8 @@ JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_startPlot(
     return;
   }
 
+  state.bitmap_fid =
+      (*env)->GetFieldID(env, cls, "plotBitmap", "Landroid/graphics/Bitmap;");
   state.elapsed_q1_fid = (*env)->GetFieldID(env, cls, "elapsedQ1", "J");
   state.elapsed_q2_fid = (*env)->GetFieldID(env, cls, "elapsedQ2", "J");
   state.elapsed_q3_fid = (*env)->GetFieldID(env, cls, "elapsedQ3", "J");
@@ -709,7 +712,8 @@ JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_changeHeight(
 }
 
 JNIEXPORT jlong JNICALL Java_com_example_softsa_PlotView_updatePlot(
-    JNIEnv *env, jclass cls, jobject view, jobject bitmap) {
+    JNIEnv *env, jclass cls, jobject view) {
+  jobject bitmap = (*env)->GetObjectField(env, view, state.bitmap_fid);
   AndroidBitmapInfo info;
   void *pixels;
   int ret;
@@ -726,6 +730,7 @@ JNIEXPORT jlong JNICALL Java_com_example_softsa_PlotView_updatePlot(
 
   if ((ret = AndroidBitmap_lockPixels(env, bitmap, &pixels)) < 0) {
     LOGE("AndroidBitmap_lockPixels() failed ! error=%d", ret);
+    return 0;
   }
 
   sem_wait(&state.sem);
