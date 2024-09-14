@@ -54,3 +54,8 @@ A short click on the screen pauses or resumes the scanning, while a long click s
     </td>
   </tr>
 </table>
+
+
+## Contact
+
+If you have any questions about this app, contact <zhoujq2024@shanghaitech.edu.cn> or <yangzhc@shanghaitech.edu.cn>.
