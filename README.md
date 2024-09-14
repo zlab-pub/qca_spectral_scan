@@ -26,13 +26,13 @@ Many Qualcomm chips' spectral scan feature can only cover a 40 MHz range centere
 
 This app shows a spectrogram on the screen, where brighter colors indicate higher FFT magnitudes. This app also employs a simple algorithm to detect Bluetooth transmission and estimate its strength. The following are screenshots of the app in the presence of frequency sweeps and Bluetooth transmission, respectively (click on either to view a screen recording):
 
-<table>
+<table width="100%">
   <tr>
-    <th scope="col">Frequency Sweeps</th>
-    <th scope="col">Bluetooth Transmission</th>
+    <th scope="col" width="50%">Frequency Sweeps</th>
+    <th scope="col" width="50%">Bluetooth Transmission</th>
   </tr>
   <tr>
-    <td>
+    <td width="50%">
       <a href="https://github.com/user-attachments/assets/fc7661dd-4d6e-4f2d-a557-94dd07076314">
         <img
           src="assets/images/sweep.png"
@@ -40,7 +40,7 @@ This app shows a spectrogram on the screen, where brighter colors indicate highe
         />
       </a>
     </td>
-    <td>
+    <td width="50%">
       <a href="https://github.com/user-attachments/assets/7ac2a5bd-31df-46bd-a4cc-2590a514cb7b">
         <img
           src="assets/images/bluetooth.png"
@@ -53,15 +53,15 @@ This app shows a spectrogram on the screen, where brighter colors indicate highe
 
 A short click on the screen pauses or resumes the scanning, while a long click shows a configuration dialog:
 
-<table>
+<table width="100%">
   <tr>
-    <td>
+    <td width="50%">
       <img
         src="assets/images/config0.png"
         alt="The configuration dialog shown on long click."
       />
     </td>
-    <td>
+    <td width="50%">
       <img
         src="assets/images/config1.png"
         alt="The configuration dialog for AP frequencies."
@@ -69,7 +69,6 @@ A short click on the screen pauses or resumes the scanning, while a long click s
     </td>
   </tr>
 </table>
-
 
 ## Contact
 
