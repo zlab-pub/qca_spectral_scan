@@ -236,6 +236,7 @@ static struct {
   struct sockaddr_un saddr;
   int sock_fd;
   const char *sock_path;
+  int64_t num_scans;
   struct plot_data *rbuffer;
   size_t rbuffer_capacity;
   size_t rbuffer_size;
@@ -304,6 +305,8 @@ static void *recv_thread(void *arg) {
     if (samp_len < 93 + bin_pwr_count || bin_pwr_count > MAX_NUM_BINS) {
       continue;
     }
+
+    state.num_scans++;
     const int8_t *bin_pwr = (int8_t *)samp_buf + 93;
     const uint16_t center_freq = *(uint16_t *)(samp_buf + 4);
 
@@ -582,15 +585,14 @@ static void resize_rbuffer(int32_t height) {
   state.rbuffer_pos = 0;
 }
 
-static size_t update_plot(const AndroidBitmapInfo *info,
-                          uint8_t *const pixels) {
-  const size_t num_scans = state.rbuffer_size;
+static void update_plot(const AndroidBitmapInfo *info, uint8_t *const pixels) {
+  const size_t num_rows = state.rbuffer_size;
 
-  if (num_scans == 0) {
-    return 0;
-  } else if (num_scans < info->height) {
-    memmove(pixels + num_scans * info->stride, pixels,
-            (info->height - num_scans) * info->stride);
+  if (num_rows == 0) {
+    return;
+  } else if (num_rows < info->height) {
+    memmove(pixels + num_rows * info->stride, pixels,
+            (info->height - num_rows) * info->stride);
   }
 
   while (state.rbuffer_size > 0) {
@@ -620,7 +622,7 @@ static size_t update_plot(const AndroidBitmapInfo *info,
     }
   }
 
-  return num_scans;
+  return;
 }
 
 JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_startPlot(
@@ -745,7 +747,10 @@ JNIEXPORT jlong JNICALL Java_com_example_softsa_PlotView_updatePlot(
 
   sem_wait(&state.sem);
 
-  size_t num_scans = update_plot(&info, pixels);
+  update_plot(&info, pixels);
+
+  int64_t num_scans = state.num_scans;
+  state.num_scans = 0;
 
   int64_t tstamp_q0 = INT32_MIN;
   int64_t tstamp_q1 = INT32_MAX;
@@ -800,5 +805,5 @@ JNIEXPORT jlong JNICALL Java_com_example_softsa_PlotView_updatePlot(
   (*env)->SetDoubleField(env, view, state.pulse_freq_fid, pulse_freq);
 #endif
 
-  return (jlong)num_scans;
+  return num_scans;
 }
