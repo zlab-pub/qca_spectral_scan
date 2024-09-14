@@ -41,6 +41,7 @@ public class SoftSA extends Activity {
   };
   private boolean[] apFreqsSelected = new boolean[apFreqsAll.length];
   private int fftSize = 7;
+  private boolean showAverage = true;
   private boolean showPulses = false;
   private ScanConnection scanConn;
 
@@ -86,14 +87,15 @@ public class SoftSA extends Activity {
   private AlertDialog configSpectrogramDialog() {
     AlertDialog.Builder builder = new AlertDialog.Builder(this);
     builder.setTitle("Spectrogram");
-    String[] items = {"Show Pulses"};
-    boolean[] checkedItems = {showPulses};
+    String[] items = {"Show 0.625 ms Average", "Show Pulses"};
+    boolean[] checkedItems = {showAverage, showPulses};
     builder.setMultiChoiceItems(items, checkedItems, (dialog, which, isChecked) -> {
       checkedItems[which] = isChecked;
     });
     builder.setPositiveButton("OK", (dialog, id) -> {
-      showPulses = checkedItems[0];
-      PlotView.configPlot(showPulses);
+      showAverage = checkedItems[0];
+      showPulses = checkedItems[1];
+      PlotView.configPlot(showAverage, showPulses);
     });
     builder.setNegativeButton("Cancel", null);
     return builder.create();
@@ -127,7 +129,7 @@ public class SoftSA extends Activity {
     });
     String uuid = UUID.randomUUID().toString();
     String sockPath = new File(getCacheDir(), uuid + ".sock").getAbsolutePath();
-    PlotView.configPlot(showPulses);
+    PlotView.configPlot(showAverage, showPulses);
     PlotView.startPlot(sockPath);
     View view = new PlotView(this);
     setContentView(view);
@@ -163,7 +165,7 @@ class PlotView extends View {
 
   static native void stopPlot();
 
-  static native void configPlot(boolean showPulses);
+  static native void configPlot(boolean showAverage, boolean showPulses);
 
   private static native void changeHeight(int height);
 

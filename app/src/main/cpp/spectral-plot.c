@@ -219,6 +219,7 @@ struct plot_data {
 
 static struct {
   atomic_bool running;
+  atomic_bool show_average;
   atomic_bool show_pulses;
   jfieldID bitmap_fid;
   jfieldID elapsed_q1_fid;
@@ -281,6 +282,7 @@ static void *recv_thread(void *arg) {
   double bt_window_sum = 0;
   int32_t bt_window_length = 0;
 #endif
+  size_t rbuffer_last_pos = SIZE_MAX;
 
   sem_wait(&state.sem);
 
@@ -478,9 +480,15 @@ static void *recv_thread(void *arg) {
     if (state.rbuffer_capacity == 0) {
       continue;
     }
+    if (state.show_average && rbuffer_last_pos < state.rbuffer_capacity &&
+        scans[window_start].tstamp <= state.rbuffer[rbuffer_last_pos].tstamp) {
+      continue;
+    }
 
     size_t rbuffer_write_pos = state.rbuffer_pos + state.rbuffer_size;
     rbuffer_write_pos %= state.rbuffer_capacity;
+    rbuffer_last_pos = rbuffer_write_pos;
+
     struct plot_data *plot_data = &state.rbuffer[rbuffer_write_pos];
     plot_data->num_pixels = bin_pwr_count;
     plot_data->tstamp = tstamp;
@@ -699,7 +707,8 @@ JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_stopPlot(JNIEnv *env,
 }
 
 JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_configPlot(
-    JNIEnv *env, jclass cls, jboolean showPulses) {
+    JNIEnv *env, jclass cls, jboolean showAverage, jboolean showPulses) {
+  state.show_average = showAverage;
   state.show_pulses = showPulses;
 }
 
