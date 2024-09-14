@@ -24,27 +24,27 @@ Alternatively, build the app on a Linux system with JDK 17 (or above) and Androi
 
 Many Qualcomm chips' spectral scan feature can only cover a 40 MHz range centered at the frequency of the current Wi-Fi channel. Therefore, it's better to run this app with hotspot enabled and "Turn off hotspot automatically" disabled. The app will then periodically switch the channel of the hotspot to cover different frequency ranges. If enabling hotspot before launching the app doesn't work, try enabling hotspot after launching the app instead.
 
-This app shows a spectrogram on the screen, where brighter colors indicate higher FFT magnitudes. This app also employs a simple algorithm to detect Bluetooth transmission and estimate its strength. The following are screenshots of the app in the presence of Bluetooth transmission and frequency sweeps, respectively (click on either to view a screen recording):
+This app shows a spectrogram on the screen, where brighter colors indicate higher FFT magnitudes. This app also employs a simple algorithm to detect Bluetooth transmission and estimate its strength. The following are screenshots of the app in the presence of frequency sweeps and Bluetooth transmission, respectively (click on either to view a screen recording):
 
 <table>
   <tr>
-    <th scope="col">Bluetooth Transmission</th>
     <th scope="col">Frequency Sweeps</th>
+    <th scope="col">Bluetooth Transmission</th>
   </tr>
   <tr>
     <td>
-      <a href="https://github.com/user-attachments/assets/d81cccf7-be4d-4b00-ac9c-f4950b1802f5">
+      <a href="https://github.com/user-attachments/assets/fc7661dd-4d6e-4f2d-a557-94dd07076314">
         <img
-          src="assets/images/bluetooth.png"
-          alt="A screenshot of the app in the presence of Bluetooth transmission."
+          src="assets/images/sweep.png"
+          alt="A screenshot of the app in the presence of frequency sweeps."
         />
       </a>
     </td>
     <td>
-      <a href="https://github.com/user-attachments/assets/0eec7569-1f0d-4098-88f1-bccec7053cc6">
+      <a href="https://github.com/user-attachments/assets/7ac2a5bd-31df-46bd-a4cc-2590a514cb7b">
         <img
-          src="assets/images/sweep.png"
-          alt="A screenshot of the app in the presence of frequency sweeps."
+          src="assets/images/bluetooth.png"
+          alt="A screenshot of the app in the presence of Bluetooth transmission."
         />
       </a>
     </td>
