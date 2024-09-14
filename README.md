@@ -1,4 +1,4 @@
-# SoftSA
+# QCA Spectral Scan
 
 An RF spectrum analyzer app for Android phones using only built-in hardware. The project is based on Qualcomm SoCs. Given Qualcomm's acquisition of Atheros, we think that their Wi-Fi modules share similarities with the Atheros [ath series](https://wireless.wiki.kernel.org/en/users/drivers/ath10k/spectral). This project has involved reverse engineering the QCA driver and has undergone a preliminary implementation to enable spectral scanning with Qualcomm-based smartphones.
 
@@ -12,7 +12,7 @@ This app requires an Android phone with the following:
 
 ## Installation
 
-Download the APK file built by GitHub Actions from the [Releases](https://github.com/zlab-pub/SoftSA/releases) page and install it using `adb install`.
+Download the APK file built by GitHub Actions from the [Releases](https://github.com/zlab-pub/qca_spectral_scan/releases) page and install it using `adb install`.
 
 Alternatively, build the app on a Linux system with JDK 17 (or above) and Android SDK 34 by running `./gradlew assembleDebug`, which produces an APK file at `app/build/outputs/apk/debug/app-debug.apk`. The following third-party dependencies will be downloaded during the build process:
 
