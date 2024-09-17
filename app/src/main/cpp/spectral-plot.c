@@ -497,7 +497,8 @@ static void *recv_thread(void *arg) {
     plot_data->tstamp = tstamp;
 
     for (uint16_t bin = 0; bin < bin_pwr_count; bin++) {
-      int8_t pwr = bin_pwr[bin];
+      int8_t pwr = state.show_average ? (int8_t)round(avg_data.bin_pwr[bin])
+                                      : bin_pwr[bin];
       uint16_t pixel = make565(0x80 + pwr, 0x40 + pwr / 2, 0xc0 + pwr / 2);
       plot_data->pixels[bin] = pixel;
     }
@@ -546,7 +547,8 @@ static void *recv_thread(void *arg) {
         }
 
         for (int bin = bin_start; bin < bin_end; bin++) {
-          int8_t pwr = bin_pwr[bin];
+          int8_t pwr = state.show_average ? (int8_t)round(avg_data.bin_pwr[bin])
+                                          : bin_pwr[bin];
           uint16_t pixel = make565(0x80 + pwr, 0xc0 + pwr / 2, 0x40 + pwr / 2);
           plot_data->pixels[bin] = pixel;
         }
