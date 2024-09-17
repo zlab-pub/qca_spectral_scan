@@ -33,7 +33,7 @@ This app shows a spectrogram on the screen, where brighter colors indicate highe
   </tr>
   <tr>
     <td width="50%">
-      <a href="https://github.com/user-attachments/assets/fc7661dd-4d6e-4f2d-a557-94dd07076314">
+      <a href="https://github.com/user-attachments/assets/5a0aeade-2124-4dcb-80f3-5166d550d1bb">
         <img
           src="assets/images/sweep.png"
           alt="A screenshot of the app in the presence of frequency sweeps."
@@ -41,7 +41,7 @@ This app shows a spectrogram on the screen, where brighter colors indicate highe
       </a>
     </td>
     <td width="50%">
-      <a href="https://github.com/user-attachments/assets/7ac2a5bd-31df-46bd-a4cc-2590a514cb7b">
+      <a href="https://github.com/user-attachments/assets/7c691a20-e685-4530-bd0e-725f1383ef5e">
         <img
           src="assets/images/bluetooth.png"
           alt="A screenshot of the app in the presence of Bluetooth transmission."
