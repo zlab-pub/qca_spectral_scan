@@ -324,9 +324,8 @@ static void *forward_thread(void *arg) {
   return NULL;
 }
 
-JNIEXPORT void JNICALL Java_com_example_softsa_ScanService_startScan(
-    JNIEnv *env, jclass cls, jintArray apFreqs, jint fftSize,
-    jstring sockPath) {
+static void JNICALL startScan(JNIEnv *env, jclass cls, jintArray apFreqs,
+                              jint fftSize, jstring sockPath) {
   if (state.running) {
     return;
   }
@@ -499,8 +498,7 @@ JNIEXPORT void JNICALL Java_com_example_softsa_ScanService_startScan(
   pthread_create(&state.forward_thread, 0, forward_thread, NULL);
 }
 
-JNIEXPORT void JNICALL
-Java_com_example_softsa_ScanService_stopScan(JNIEnv *env, jclass cls) {
+static void JNICALL stopScan(JNIEnv *env, jclass cls) {
   if (!state.running) {
     return;
   }
@@ -529,4 +527,29 @@ Java_com_example_softsa_ScanService_stopScan(JNIEnv *env, jclass cls) {
   state.nl_sock_ap_ctrl = NULL;
   state.nl_sock_recv = NULL;
   state.nl_sock_send = NULL;
+}
+
+static const JNINativeMethod methods[] = {
+    {"startScan", "([IILjava/lang/String;)V", startScan},
+    {"stopScan", "()V", stopScan},
+};
+
+JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+  JNIEnv *env;
+  if ((*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_6) != JNI_OK) {
+    return JNI_ERR;
+  }
+
+  jclass cls = (*env)->FindClass(env, "com/example/softsa/ScanService");
+  if (cls == NULL) {
+    return JNI_ERR;
+  }
+
+  int rc = (*env)->RegisterNatives(env, cls, methods,
+                                   sizeof(methods) / sizeof(methods[0]));
+  if (rc != JNI_OK) {
+    return rc;
+  }
+
+  return JNI_VERSION_1_6;
 }

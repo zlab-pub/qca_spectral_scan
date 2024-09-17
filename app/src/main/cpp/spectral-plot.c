@@ -627,8 +627,7 @@ static void update_plot(const AndroidBitmapInfo *info, uint8_t *const pixels) {
   return;
 }
 
-JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_startPlot(
-    JNIEnv *env, jclass cls, jstring sockPath) {
+static void JNICALL startPlot(JNIEnv *env, jclass cls, jstring sockPath) {
   if (state.running) {
     return;
   }
@@ -686,8 +685,7 @@ JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_startPlot(
   pthread_create(&state.recv_thread, 0, recv_thread, NULL);
 }
 
-JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_stopPlot(JNIEnv *env,
-                                                                 jclass cls) {
+static void JNICALL stopPlot(JNIEnv *env, jclass cls) {
   if (!state.running) {
     return;
   }
@@ -710,14 +708,13 @@ JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_stopPlot(JNIEnv *env,
   state.sock_path = NULL;
 }
 
-JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_configPlot(
-    JNIEnv *env, jclass cls, jboolean showAverage, jboolean showPulses) {
+static void JNICALL configPlot(JNIEnv *env, jclass cls, jboolean showAverage,
+                               jboolean showPulses) {
   state.show_average = showAverage;
   state.show_pulses = showPulses;
 }
 
-JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_changeHeight(
-    JNIEnv *env, jclass cls, jint height) {
+static void JNICALL changeHeight(JNIEnv *env, jclass cls, jint height) {
   sem_wait(&state.sem);
   if (height >= 0 && (size_t)height != state.rbuffer_capacity) {
     resize_rbuffer(height);
@@ -725,8 +722,7 @@ JNIEXPORT void JNICALL Java_com_example_softsa_PlotView_changeHeight(
   sem_post(&state.sem);
 }
 
-JNIEXPORT jlong JNICALL Java_com_example_softsa_PlotView_updatePlot(
-    JNIEnv *env, jclass cls, jobject view) {
+static jlong JNICALL updatePlot(JNIEnv *env, jclass cls, jobject view) {
   jobject bitmap = (*env)->GetObjectField(env, view, state.bitmap_fid);
   AndroidBitmapInfo info;
   void *pixels;
@@ -808,4 +804,32 @@ JNIEXPORT jlong JNICALL Java_com_example_softsa_PlotView_updatePlot(
 #endif
 
   return num_scans;
+}
+
+static const JNINativeMethod methods[] = {
+    {"startPlot", "(Ljava/lang/String;)V", startPlot},
+    {"stopPlot", "()V", stopPlot},
+    {"configPlot", "(ZZ)V", configPlot},
+    {"changeHeight", "(I)V", changeHeight},
+    {"updatePlot", "(Lcom/example/softsa/PlotView;)J", updatePlot},
+};
+
+JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
+  JNIEnv *env;
+  if ((*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_6) != JNI_OK) {
+    return JNI_ERR;
+  }
+
+  jclass cls = (*env)->FindClass(env, "com/example/softsa/PlotView");
+  if (cls == NULL) {
+    return JNI_ERR;
+  }
+
+  int rc = (*env)->RegisterNatives(env, cls, methods,
+                                   sizeof(methods) / sizeof(methods[0]));
+  if (rc != JNI_OK) {
+    return rc;
+  }
+
+  return JNI_VERSION_1_6;
 }
