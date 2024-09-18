@@ -131,14 +131,13 @@ public class SoftSA extends Activity {
     String sockPath = new File(getCacheDir(), uuid + ".sock").getAbsolutePath();
     PlotView.configPlot(showAverage, showPulses);
     PlotView.startPlot(sockPath);
-    View view = new PlotView(this);
-    setContentView(view);
     scanConn = new ScanConnection();
     Intent scanIntent = new Intent(this, ScanService.class);
     scanIntent.putExtra("com.example.softsa.ap_freqs", getApFreqs());
     scanIntent.putExtra("com.example.softsa.fft_size", fftSize);
     scanIntent.putExtra("com.example.softsa.sock_path", sockPath);
     RootService.bind(scanIntent, scanConn);
+    View view = new PlotView(this);
     view.setOnClickListener(v -> {
       scanConn.pause();
     });
@@ -146,6 +145,7 @@ public class SoftSA extends Activity {
       configDialog().show();
       return true;
     });
+    setContentView(view);
   }
 
   @Override
@@ -208,13 +208,13 @@ class PlotView extends View {
     centerSmallPaint.setColor(Color.YELLOW);
     centerSmallPaint.setTextSize(10 * density);
     centerSmallPaint.setTextAlign(Paint.Align.CENTER);
+    Arrays.fill(prevDrawTime, System.nanoTime());
   }
 
   @Override
   protected void onSizeChanged(int w, int h, int oldw, int oldh) {
     plotBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.RGB_565);
     changeHeight(h);
-    Arrays.fill(prevDrawTime, System.nanoTime());
   }
 
   @Override
