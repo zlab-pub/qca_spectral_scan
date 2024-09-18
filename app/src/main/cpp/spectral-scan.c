@@ -351,36 +351,6 @@ static void JNICALL startScan(JNIEnv *env, jclass cls, jintArray apFreqs,
     return;
   }
 
-  char ifname[PROP_VALUE_MAX] = "";
-  const prop_info *pi = __system_property_find("wifi.interface");
-  if (pi != NULL) {
-    __system_property_read(pi, NULL, ifname);
-  }
-  if (ifname[0] == '\0') {
-    strlcpy(ifname, "wlan0", sizeof(ifname));
-  }
-  unsigned ifindex = if_nametoindex(ifname);
-  if (ifindex == 0) {
-    LOGE("Can't get WLAN interface index: %s", strerror(errno));
-    return;
-  }
-
-  char ap_ifname[PROP_VALUE_MAX] = "";
-  pi = __system_property_find("ro.vendor.wifi.sap.interface");
-  if (pi != NULL) {
-    __system_property_read(pi, NULL, ap_ifname);
-  }
-  if (ap_ifname[0] == '\0') {
-    pi = __system_property_find("wifi.concurrent.interface");
-    if (pi != NULL) {
-      __system_property_read(pi, NULL, ap_ifname);
-    }
-  }
-  if (ap_ifname[0] == '\0') {
-    strlcpy(ap_ifname, "wlan1", sizeof(ap_ifname));
-  }
-  state.ap_ifindex = if_nametoindex(ap_ifname);
-
   struct nl_sock *nl_sock_send = nl_socket_alloc();
   if (nl_sock_send == NULL) {
     LOGE("Can't allocate send socket");
@@ -485,7 +455,6 @@ static void JNICALL startScan(JNIEnv *env, jclass cls, jintArray apFreqs,
   state.ap_freqs_count = ap_freqs_count;
   state.fft_size = fft_size;
   state.sock_forward = sock_forward;
-  state.ifindex = ifindex;
   state.send_fam = send_fam;
   state.nl_sock_send = nl_sock_send;
   state.nl_sock_recv = nl_sock_recv;
@@ -550,6 +519,36 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
   if (rc != JNI_OK) {
     return rc;
   }
+
+  char ifname[PROP_VALUE_MAX] = "";
+  const prop_info *pi = __system_property_find("wifi.interface");
+  if (pi != NULL) {
+    __system_property_read(pi, NULL, ifname);
+  }
+  if (ifname[0] == '\0') {
+    strlcpy(ifname, "wlan0", sizeof(ifname));
+  }
+  state.ifindex = if_nametoindex(ifname);
+  if (state.ifindex == 0) {
+    LOGE("Can't get WLAN interface index: %s", strerror(errno));
+    return JNI_ERR;
+  }
+
+  char ap_ifname[PROP_VALUE_MAX] = "";
+  pi = __system_property_find("ro.vendor.wifi.sap.interface");
+  if (pi != NULL) {
+    __system_property_read(pi, NULL, ap_ifname);
+  }
+  if (ap_ifname[0] == '\0') {
+    pi = __system_property_find("wifi.concurrent.interface");
+    if (pi != NULL) {
+      __system_property_read(pi, NULL, ap_ifname);
+    }
+  }
+  if (ap_ifname[0] == '\0') {
+    strlcpy(ap_ifname, "wlan1", sizeof(ap_ifname));
+  }
+  state.ap_ifindex = if_nametoindex(ap_ifname);
 
   return JNI_VERSION_1_6;
 }
