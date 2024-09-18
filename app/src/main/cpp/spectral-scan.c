@@ -211,6 +211,7 @@ static void *scan_thread(void *arg) {
 
 #define SPECTRAL_CONFIG(k, v)                                                  \
   NLA_PUT_U32(msg_start, QCA_WLAN_VENDOR_ATTR_SPECTRAL_SCAN_CONFIG_##k, (v))
+
     SPECTRAL_CONFIG(SCAN_COUNT, 0);
     SPECTRAL_CONFIG(SCAN_PERIOD, 0);
     SPECTRAL_CONFIG(FFT_SIZE, state.fft_size);
@@ -218,6 +219,7 @@ static void *scan_thread(void *arg) {
     SPECTRAL_CONFIG(PWR_FORMAT, 1);
     SPECTRAL_CONFIG(RPT_MODE, 3);
     SPECTRAL_CONFIG(DBM_ADJ, 1);
+
 #undef SPECTRAL_CONFIG
 
     int nl_err = nla_nest_end(msg_start, nest);

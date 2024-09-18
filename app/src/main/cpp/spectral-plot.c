@@ -221,17 +221,17 @@ static struct {
   atomic_bool running;
   atomic_bool show_average;
   atomic_bool show_pulses;
-  jfieldID bitmap_fid;
-  jfieldID elapsed_q1_fid;
-  jfieldID elapsed_q2_fid;
-  jfieldID elapsed_q3_fid;
-  jfieldID center_pos_fid;
-  jfieldID center_freq_fid;
-  jfieldID span_width_fid;
+  jfieldID plotBitmap_fid;
+  jfieldID elapsedQ1_fid;
+  jfieldID elapsedQ2_fid;
+  jfieldID elapsedQ3_fid;
+  jfieldID centerPos_fid;
+  jfieldID centerFreq_fid;
+  jfieldID spanWidth_fid;
 #ifdef SPECTRAL_DETECT
-  jfieldID bt_pwr_fid;
+  jfieldID bluetoothPower_fid;
 #else
-  jfieldID pulse_freq_fid;
+  jfieldID pulseFreq_fid;
 #endif
   struct sockaddr_un saddr;
   int sock_fd;
@@ -632,20 +632,6 @@ static void JNICALL startPlot(JNIEnv *env, jclass cls, jstring sockPath) {
     return;
   }
 
-  state.bitmap_fid =
-      (*env)->GetFieldID(env, cls, "plotBitmap", "Landroid/graphics/Bitmap;");
-  state.elapsed_q1_fid = (*env)->GetFieldID(env, cls, "elapsedQ1", "J");
-  state.elapsed_q2_fid = (*env)->GetFieldID(env, cls, "elapsedQ2", "J");
-  state.elapsed_q3_fid = (*env)->GetFieldID(env, cls, "elapsedQ3", "J");
-  state.center_pos_fid = (*env)->GetFieldID(env, cls, "centerPos", "F");
-  state.center_freq_fid = (*env)->GetFieldID(env, cls, "centerFreq", "I");
-  state.span_width_fid = (*env)->GetFieldID(env, cls, "spanWidth", "I");
-#ifdef SPECTRAL_DETECT
-  state.bt_pwr_fid = (*env)->GetFieldID(env, cls, "bluetoothPower", "D");
-#else
-  state.pulse_freq_fid = (*env)->GetFieldID(env, cls, "pulseFreq", "D");
-#endif
-
   const char *sock_path = (*env)->GetStringUTFChars(env, sockPath, NULL);
   if (sock_path == NULL) {
     LOGE("Can't get socket path");
@@ -731,7 +717,7 @@ static jlong JNICALL updatePlot(JNIEnv *env, jclass cls, jobject view) {
     return 0;
   }
 
-  jobject bitmap = (*env)->GetObjectField(env, view, state.bitmap_fid);
+  jobject bitmap = (*env)->GetObjectField(env, view, state.plotBitmap_fid);
   AndroidBitmapInfo info;
   void *pixels;
   int ret;
@@ -799,16 +785,16 @@ static jlong JNICALL updatePlot(JNIEnv *env, jclass cls, jobject view) {
 
   AndroidBitmap_unlockPixels(env, bitmap);
 
-  (*env)->SetLongField(env, view, state.elapsed_q1_fid, tstamp_q0 - tstamp_q1);
-  (*env)->SetLongField(env, view, state.elapsed_q2_fid, tstamp_q0 - tstamp_q2);
-  (*env)->SetLongField(env, view, state.elapsed_q3_fid, tstamp_q0 - tstamp_q3);
-  (*env)->SetFloatField(env, view, state.center_pos_fid, center_pos);
-  (*env)->SetIntField(env, view, state.center_freq_fid, center_freq);
-  (*env)->SetIntField(env, view, state.span_width_fid, SPAN_WIDTH);
+  (*env)->SetLongField(env, view, state.elapsedQ1_fid, tstamp_q0 - tstamp_q1);
+  (*env)->SetLongField(env, view, state.elapsedQ2_fid, tstamp_q0 - tstamp_q2);
+  (*env)->SetLongField(env, view, state.elapsedQ3_fid, tstamp_q0 - tstamp_q3);
+  (*env)->SetFloatField(env, view, state.centerPos_fid, center_pos);
+  (*env)->SetIntField(env, view, state.centerFreq_fid, center_freq);
+  (*env)->SetIntField(env, view, state.spanWidth_fid, SPAN_WIDTH);
 #ifdef SPECTRAL_DETECT
-  (*env)->SetDoubleField(env, view, state.bt_pwr_fid, bt_pwr);
+  (*env)->SetDoubleField(env, view, state.bluetoothPower_fid, bt_pwr);
 #else
-  (*env)->SetDoubleField(env, view, state.pulse_freq_fid, pulse_freq);
+  (*env)->SetDoubleField(env, view, state.pulseFreq_fid, pulse_freq);
 #endif
 
   return num_scans;
@@ -841,6 +827,30 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     LOGE("Can't register native methods of PlotView class");
     return rc;
   }
+
+#define GET_FIELD_ID(name, sig)                                                \
+  do {                                                                         \
+    state.name##_fid = (*env)->GetFieldID(env, cls, #name, (sig));             \
+    if (state.name##_fid == NULL) {                                            \
+      LOGE("Can't get field ID for " #name " field of PlotView class");        \
+      return JNI_ERR;                                                          \
+    }                                                                          \
+  } while (0)
+
+  GET_FIELD_ID(plotBitmap, "Landroid/graphics/Bitmap;");
+  GET_FIELD_ID(elapsedQ1, "J");
+  GET_FIELD_ID(elapsedQ2, "J");
+  GET_FIELD_ID(elapsedQ3, "J");
+  GET_FIELD_ID(centerPos, "F");
+  GET_FIELD_ID(centerFreq, "I");
+  GET_FIELD_ID(spanWidth, "I");
+#ifdef SPECTRAL_DETECT
+  GET_FIELD_ID(bluetoothPower, "D");
+#else
+  GET_FIELD_ID(pulseFreq, "D");
+#endif
+
+#undef GET_FIELD_ID
 
   return JNI_VERSION_1_6;
 }
