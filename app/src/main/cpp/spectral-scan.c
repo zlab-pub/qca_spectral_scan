@@ -506,17 +506,20 @@ static const JNINativeMethod methods[] = {
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
   JNIEnv *env;
   if ((*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_6) != JNI_OK) {
+    LOGE("Can't get JNI environment");
     return JNI_ERR;
   }
 
   jclass cls = (*env)->FindClass(env, "com/example/softsa/ScanService");
   if (cls == NULL) {
+    LOGE("Can't find ScanService class");
     return JNI_ERR;
   }
 
   int rc = (*env)->RegisterNatives(env, cls, methods,
                                    sizeof(methods) / sizeof(methods[0]));
   if (rc != JNI_OK) {
+    LOGE("Can't register native methods of ScanService class");
     return rc;
   }
 

@@ -715,6 +715,10 @@ static void JNICALL configPlot(JNIEnv *env, jclass cls, jboolean showAverage,
 }
 
 static void JNICALL changeHeight(JNIEnv *env, jclass cls, jint height) {
+  if (!state.running) {
+    return;
+  }
+
   sem_wait(&state.sem);
   if (height >= 0 && (size_t)height != state.rbuffer_capacity) {
     resize_rbuffer(height);
@@ -723,6 +727,10 @@ static void JNICALL changeHeight(JNIEnv *env, jclass cls, jint height) {
 }
 
 static jlong JNICALL updatePlot(JNIEnv *env, jclass cls, jobject view) {
+  if (!state.running) {
+    return 0;
+  }
+
   jobject bitmap = (*env)->GetObjectField(env, view, state.bitmap_fid);
   AndroidBitmapInfo info;
   void *pixels;
@@ -817,17 +825,20 @@ static const JNINativeMethod methods[] = {
 JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
   JNIEnv *env;
   if ((*vm)->GetEnv(vm, (void **)&env, JNI_VERSION_1_6) != JNI_OK) {
+    LOGE("Can't get JNI environment");
     return JNI_ERR;
   }
 
   jclass cls = (*env)->FindClass(env, "com/example/softsa/PlotView");
   if (cls == NULL) {
+    LOGE("Can't find PlotView class");
     return JNI_ERR;
   }
 
   int rc = (*env)->RegisterNatives(env, cls, methods,
                                    sizeof(methods) / sizeof(methods[0]));
   if (rc != JNI_OK) {
+    LOGE("Can't register native methods of PlotView class");
     return rc;
   }
 
