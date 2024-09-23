@@ -1,10 +1,11 @@
 **/.cache
+**/.project
+**/.settings/
 **/compile_commands.json
 /.gradle/
 /.idea/
+/app/.classpath
 /app/.cxx/
-/app/.project
-/app/.settings/
 /app/build/
 /distribution/
 local.properties
