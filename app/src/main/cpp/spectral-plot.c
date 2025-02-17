@@ -23,8 +23,8 @@
 
 #define SPECTRAL_DETECT
 
-enum { MAX_NUM_BINS = 512 };
-enum { SPAN_WIDTH = 40 };
+#define MAX_NUM_BINS 512
+#define SPAN_WIDTH 40
 
 struct scan_data {
   int8_t bin_pwr[MAX_NUM_BINS];
@@ -257,7 +257,7 @@ static void *recv_thread(void *arg) {
   struct sigaction sa = {.sa_handler = handle_sigint};
   sigaction(SIGINT, &sa, NULL);
 
-  enum { MAX_WINDOW_SIZE = 200 };
+#define MAX_WINDOW_SIZE 200
   static const int32_t max_window_time = 625;
   struct scan_data scans[MAX_WINDOW_SIZE];
   size_t window_start = 0;
@@ -267,8 +267,8 @@ static void *recv_thread(void *arg) {
   uint16_t num_pulses = 0;
 #ifdef SPECTRAL_DETECT
   int32_t prev_tstamp = INT32_MAX;
-  enum { NUM_BT_CHANS = 79 };
-  enum { NUM_ZB_CHANS = 16 };
+#define NUM_BT_CHANS 79
+#define NUM_ZB_CHANS 16
   int non_bt_score[NUM_BT_CHANS] = {0};
   int non_zb_score[NUM_ZB_CHANS] = {0};
   int last_bt_chan = -1;
