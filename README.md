@@ -70,6 +70,17 @@ A short click on the screen pauses or resumes the scanning, while a long click s
   </tr>
 </table>
 
+## Citation
+
+```bibtex
+@inproceedings{zhou2025enabling,
+  author = {Jiaqi Zhou and Yihong Hang and Si Liao and Zhice Yang},
+  booktitle = {IEEE INFOCOM 2025 - IEEE Conference on Computer Communications Workshops (INFOCOM WKSHPS)},
+  title = {Enabling Radio Spectrum Scan with Smartphones},
+  year = {2025},
+}
+```
+
 ## Contact
 
 If you have any questions about this project, contact <zhoujq2024@shanghaitech.edu.cn> or <yangzhc@shanghaitech.edu.cn>.
