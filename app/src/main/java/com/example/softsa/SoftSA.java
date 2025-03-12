@@ -1,16 +1,21 @@
 package com.example.softsa;
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.location.LocationManager;
+import android.net.wifi.WifiManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
@@ -18,6 +23,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.provider.Settings;
 import android.view.View;
 import android.view.Window;
 
@@ -35,15 +41,44 @@ import java.util.stream.IntStream;
 import com.topjohnwu.superuser.ipc.RootService;
 
 public class SoftSA extends Activity {
+  private static final String apPermission = Build.VERSION.SDK_INT >= 33
+    ? Manifest.permission.NEARBY_WIFI_DEVICES
+    : Manifest.permission.ACCESS_FINE_LOCATION;
+  private static final String[] apPermissions = {apPermission};
   private static final int[] apFreqsAll = {
     2412, 2417, 2422, 2427, 2432, 2437, 2442, 2447, 2452, 2457, 2462, 2467, 2472,
     5180, 5200, 5220, 5240, 5745, 5765, 5785, 5805, 5825,
   };
+
+  private WifiManager.LocalOnlyHotspotReservation apReservation;
   private boolean[] apFreqsSelected = new boolean[apFreqsAll.length];
   private int fftSize = 7;
   private boolean showAverage = true;
   private boolean showPulses = false;
   private ScanConnection scanConn;
+
+  @SuppressWarnings("deprecation")
+  private boolean isLocationEnabled() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      LocationManager locationManager
+        = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+      return locationManager != null && locationManager.isLocationEnabled();
+    } else {
+      int locationMode = Settings.Secure.getInt(getContentResolver(),
+        Settings.Secure.LOCATION_MODE, Settings.Secure.LOCATION_MODE_OFF);
+      return locationMode != Settings.Secure.LOCATION_MODE_OFF;
+    }
+  }
+
+  private boolean canStartAp() {
+    if (checkSelfPermission(apPermission) != PackageManager.PERMISSION_GRANTED) {
+      return false;
+    }
+    if (apPermission != Manifest.permission.ACCESS_FINE_LOCATION) {
+      return true;
+    }
+    return isLocationEnabled();
+  }
 
   private int[] getApFreqs() {
     return IntStream.range(0, apFreqsSelected.length)
@@ -121,9 +156,34 @@ public class SoftSA extends Activity {
   }
 
   @Override
+  public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                         int[] grantResults) {
+    if (apReservation != null || !canStartAp()) {
+      return;
+    }
+    WifiManager wifiManager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+    if (wifiManager == null) {
+      return;
+    }
+
+    wifiManager.startLocalOnlyHotspot(new WifiManager.LocalOnlyHotspotCallback() {
+      @Override
+      public void onStarted(WifiManager.LocalOnlyHotspotReservation reservation) {
+        apReservation = reservation;
+      }
+
+      @Override
+      public void onStopped() {
+        apReservation = null;
+      }
+    }, null);
+  }
+
+  @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     requestWindowFeature(Window.FEATURE_NO_TITLE);
+    requestPermissions(apPermissions, 0);
     IntStream.range(0, apFreqsAll.length).forEach(i -> {
       apFreqsSelected[i] = (apFreqsAll[i] == 2422 || apFreqsAll[i] == 2462);
     });
@@ -153,6 +213,9 @@ public class SoftSA extends Activity {
     super.onDestroy();
     RootService.unbind(scanConn);
     PlotView.stopPlot();
+    if (apReservation != null) {
+      apReservation.close();
+    }
   }
 }
 

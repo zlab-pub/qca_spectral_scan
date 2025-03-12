@@ -6,7 +6,7 @@ An RF spectrum analyzer app for Android phones using only built-in hardware. The
 
 This app requires an Android phone with the following:
 
-- Android 7 or above (tested on Google Pixel 5 with Android 11 and Android 14)
+- Android 8 or above (tested on Google Pixel 5 with Android 11 and Android 14)
 - Root access (e.g. using [Magisk](https://github.com/topjohnwu/Magisk/))
 - Qualcomm qcacld-3.0 driver
 
@@ -22,7 +22,7 @@ Alternatively, build the app on a Linux system with JDK 17 and Android SDK 34 by
 
 ## Usage
 
-Many Qualcomm chips' spectral scan feature can only cover a 40 MHz range centered at the frequency of the current Wi-Fi channel. Therefore, it's better to run this app with hotspot enabled and "Turn off hotspot automatically" disabled. The app will then periodically switch the channel of the hotspot to cover different frequency ranges. If enabling hotspot before launching the app doesn't work, try enabling hotspot after launching the app instead.
+Many Qualcomm chips' spectral scan feature can only cover a 40 MHz range centered at the frequency of the current Wi-Fi channel. Therefore, this app needs to use a Wi-Fi hotspot and periodically switch its channel to cover different frequency ranges. If granted the "Nearby devices" permission (or the "Location" permission on Android versions below 13), the app will automatically start a local-only hotspot. If that doesn't work, try enabling Wi-Fi hotspot manually.
 
 This app shows a spectrogram on the screen, where brighter colors indicate higher FFT magnitudes. This app also employs a simple algorithm to detect Bluetooth transmission and estimate its strength. The following are screenshots of the app in the presence of frequency sweeps and Bluetooth transmission, respectively (click on either to view a screen recording):
 
