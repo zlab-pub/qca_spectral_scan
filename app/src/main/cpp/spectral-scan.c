@@ -42,7 +42,7 @@ static struct {
   atomic_uint_least32_t scan_freq;
   struct sockaddr_un saddr_forward;
   int sock_forward;
-  unsigned ifindex;
+  atomic_uint_least32_t ifindex;
   atomic_uint_least32_t ap_ifindex;
   int send_fam;
   struct nl_sock *nl_sock_send;
@@ -155,7 +155,7 @@ static void check_ap_freq() {
     nla_for_each_attr(nla, genlmsg_attrdata(gnlh, 0), genlmsg_attrlen(gnlh, 0),
                       rem) {
       if (nla_type(nla) == NL80211_ATTR_IFINDEX) {
-        state.ap_ifindex = nla_get_u32(nla);
+        state.ifindex = state.ap_ifindex = nla_get_u32(nla);
       } else if (nla_type(nla) == NL80211_ATTR_WIPHY_FREQ) {
         state.ap_freq = nla_get_u32(nla);
       }
@@ -534,10 +534,6 @@ JNIEXPORT jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     strlcpy(ifname, "wlan0", sizeof(ifname));
   }
   state.ifindex = if_nametoindex(ifname);
-  if (state.ifindex == 0) {
-    LOGE("Can't get WLAN interface index: %s", strerror(errno));
-    return JNI_ERR;
-  }
 
   char ap_ifname[PROP_VALUE_MAX] = "";
   pi = __system_property_find("ro.vendor.wifi.sap.interface");
