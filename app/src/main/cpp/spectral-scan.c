@@ -26,6 +26,7 @@
 #include <sys/system_properties.h>
 #include <sys/un.h>
 #include <sys/wait.h>
+#include <time.h>
 #include <unistd.h>
 
 #define LOG_TAG "spectral-scan"
@@ -55,6 +56,14 @@ static struct {
 } state;
 
 static void handle_sigint(int sig) {}
+
+static inline void sleep_ms(int ms) {
+  const struct timespec ts = {
+      .tv_sec = ms / 1000,
+      .tv_nsec = (ms % 1000) * 1000000L,
+  };
+  clock_nanosleep(CLOCK_MONOTONIC, 0, &ts, NULL);
+}
 
 static void switch_ap_freq(int freq) {
   if (state.ap_ifindex == 0) {
@@ -116,7 +125,7 @@ static void *ap_ctrl_thread(void *arg) {
     if (counter == 0) {
       switch_ap_freq(state.ap_freqs[chan_idx]);
     }
-    usleep(20000);
+    sleep_ms(20);
     if (++counter >= 50) {
       counter = 0;
       chan_idx++;
@@ -236,7 +245,7 @@ static void *scan_thread(void *arg) {
     }
 
     state.scan_freq = state.ap_freq;
-    usleep(10000);
+    sleep_ms(10);
 
     nl_err = nl_send_sync(state.nl_sock_send, msg_stop);
     if (nl_err < 0) {
