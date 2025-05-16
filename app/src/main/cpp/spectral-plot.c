@@ -41,7 +41,7 @@ struct window_avg_data {
 };
 
 #ifdef SPECTRAL_DETECT
-static const int thres_min = -100;
+static const int thres_min = -90;
 #else
 static const int thres_min = -80;
 #endif
