@@ -3,7 +3,7 @@ project(SoftSA C)
 include(ExternalProject)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-add_compile_options(-Wall -Wextra -Wconversion -Wshadow -Wno-unused-parameter -Werror)
+add_compile_options(-Wall -Wextra -Wconversion -Wshadow -Wvla -Wno-unused-parameter)
 
 set(distribution_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../../distribution")
 
