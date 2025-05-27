@@ -267,10 +267,19 @@ static void *forward_thread(void *arg) {
 
   const int sock_recv = nl_socket_get_fd(state.nl_sock_recv);
 
+  const int rcvbufsize = 1048576;
+  if (setsockopt(sock_recv, SOL_SOCKET, SO_RCVBUFFORCE, &rcvbufsize,
+                 sizeof(rcvbufsize)) < 0) {
+    LOGW("Can't set receive buffer size: %s", strerror(errno));
+  }
+
   while (state.running) {
     uint8_t msg[4096];
     const ssize_t msg_len = recv(sock_recv, msg, sizeof(msg), 0);
     if (msg_len < 0) {
+      if (errno != EINTR) {
+        LOGW("Can't receive spectral scan result: %s", strerror(errno));
+      }
       continue;
     }
 

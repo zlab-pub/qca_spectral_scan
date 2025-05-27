@@ -293,6 +293,12 @@ static void *recv_thread(void *arg) {
     const ssize_t samp_len = recv(state.sock_fd, samp_buf, sizeof(samp_buf), 0);
     sem_wait(&state.sem);
 
+    if (samp_len < 0) {
+      if (errno != EINTR) {
+        LOGW("Can't receive spectral scan result: %s", strerror(errno));
+      }
+      continue;
+    }
     if (samp_len < 93) {
       continue;
     }
