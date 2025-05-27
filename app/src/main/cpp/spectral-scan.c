@@ -277,7 +277,7 @@ static void *forward_thread(void *arg) {
     uint8_t msg[4096];
     const ssize_t msg_len = recv(sock_recv, msg, sizeof(msg), 0);
     if (msg_len < 0) {
-      if (errno != EINTR) {
+      if (state.running) {
         LOGW("Can't receive spectral scan result: %s", strerror(errno));
       }
       continue;
