@@ -242,10 +242,10 @@ static void *scan_thread(void *arg) {
     nl_err = nl_send_sync(state.nl_sock_send, msg_start);
     if (nl_err < 0) {
       LOGW("Can't start spectral scan: %s", nl_geterror(nl_err));
+    } else {
+      state.scan_freq = state.ap_freq;
+      sleep_ms(10);
     }
-
-    state.scan_freq = state.ap_freq;
-    sleep_ms(10);
 
     nl_err = nl_send_sync(state.nl_sock_send, msg_stop);
     if (nl_err < 0) {
