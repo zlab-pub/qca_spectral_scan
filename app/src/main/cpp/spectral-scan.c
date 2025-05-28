@@ -139,11 +139,15 @@ static void *ap_ctrl_thread(void *arg) {
 static void check_ap_freq(void) {
   const int sock = nl_socket_get_fd(state.nl_sock_ap_event);
 
-  for (;;) {
+  while (state.running) {
     uint8_t msg[4096];
     const ssize_t msg_len = recv(sock, msg, sizeof(msg), MSG_DONTWAIT);
     if (msg_len < 0) {
-      return;
+      if (errno == EAGAIN || errno == EWOULDBLOCK || !state.running) {
+        break;
+      }
+      LOGW("Can't receive AP events: %s", strerror(errno));
+      continue;
     }
 
     struct nlmsghdr *nlh = (struct nlmsghdr *)msg;
@@ -277,9 +281,10 @@ static void *forward_thread(void *arg) {
     uint8_t msg[4096];
     const ssize_t msg_len = recv(sock_recv, msg, sizeof(msg), 0);
     if (msg_len < 0) {
-      if (state.running) {
-        LOGW("Can't receive spectral scan result: %s", strerror(errno));
+      if (!state.running) {
+        break;
       }
+      LOGW("Can't receive spectral scan result: %s", strerror(errno));
       continue;
     }
 

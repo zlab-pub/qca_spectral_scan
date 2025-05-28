@@ -294,9 +294,10 @@ static void *recv_thread(void *arg) {
     sem_wait(&state.sem);
 
     if (samp_len < 0) {
-      if (state.running) {
-        LOGW("Can't receive spectral scan result: %s", strerror(errno));
+      if (!state.running) {
+        break;
       }
+      LOGW("Can't receive spectral scan result: %s", strerror(errno));
       continue;
     }
 
