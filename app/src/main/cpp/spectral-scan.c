@@ -136,7 +136,7 @@ static void *ap_ctrl_thread(void *arg) {
   return NULL;
 }
 
-static void check_ap_freq() {
+static void check_ap_freq(void) {
   const int sock = nl_socket_get_fd(state.nl_sock_ap_event);
 
   for (;;) {
