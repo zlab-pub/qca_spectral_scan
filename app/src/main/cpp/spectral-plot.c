@@ -289,7 +289,7 @@ static void *recv_thread(void *arg) {
 
   while (state.running) {
     sem_post(&state.sem);
-    uint8_t samp_buf[1216];
+    uint8_t samp_buf[1600];
     const ssize_t samp_len = recv(state.sock_fd, samp_buf, sizeof(samp_buf), 0);
     sem_wait(&state.sem);
 
