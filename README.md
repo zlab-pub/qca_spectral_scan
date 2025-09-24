@@ -78,6 +78,7 @@ A short click on the screen pauses or resumes the scanning, while a long click s
   booktitle = {IEEE INFOCOM 2025 - IEEE Conference on Computer Communications Workshops (INFOCOM WKSHPS)},
   title = {Enabling Radio Spectrum Scan with Smartphones},
   year = {2025},
+  doi = {10.1109/INFOCOMWKSHPS65812.2025.11152827},
 }
 ```
 
