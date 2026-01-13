@@ -487,9 +487,9 @@ static void JNICALL startScan(JNIEnv *env, jclass cls, jintArray apFreqs,
   state.nl_sock_ap_event = nl_sock_ap_event;
 
   state.running = true;
-  pthread_create(&state.ap_ctrl_thread, 0, ap_ctrl_thread, NULL);
-  pthread_create(&state.scan_thread, 0, scan_thread, NULL);
-  pthread_create(&state.forward_thread, 0, forward_thread, NULL);
+  pthread_create(&state.ap_ctrl_thread, NULL, ap_ctrl_thread, NULL);
+  pthread_create(&state.scan_thread, NULL, scan_thread, NULL);
+  pthread_create(&state.forward_thread, NULL, forward_thread, NULL);
 }
 
 static void JNICALL stopScan(JNIEnv *env, jclass cls) {

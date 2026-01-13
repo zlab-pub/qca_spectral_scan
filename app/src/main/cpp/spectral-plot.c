@@ -676,7 +676,7 @@ static void JNICALL startPlot(JNIEnv *env, jclass cls, jstring sockPath) {
 #endif
   sem_init(&state.sem, 0, 1);
   state.running = true;
-  pthread_create(&state.recv_thread, 0, recv_thread, NULL);
+  pthread_create(&state.recv_thread, NULL, recv_thread, NULL);
 }
 
 static void JNICALL stopPlot(JNIEnv *env, jclass cls) {
